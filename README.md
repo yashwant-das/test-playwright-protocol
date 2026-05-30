@@ -252,11 +252,11 @@ The runner selects work in this order:
 2. Existing `BLOCKED` task.
 3. Next dependency-ready `TODO` task.
 
-When a `TODO` task is selected, the runner moves it to `IN_PROGRESS` and prints a prompt for your AI assistant.
+When a `TODO` task is selected, the runner moves it to `IN_PROGRESS` and prints a prompt formatted for your AI assistant.
 
 ### 3. Hand Off to the AI Assistant
 
-Give the printed prompt to your AI assistant. The assistant should:
+Copy the generated prompt string and paste it to your AI assistant. The assistant should:
 
 - Read [AGENTS.md](AGENTS.md).
 - Read the active task file.
@@ -285,13 +285,13 @@ If both commands pass, the task moves to `DONE`.
 
 ### 5. Fix Blocked Tasks
 
-If verification fails, the task moves to `BLOCKED`. Read the log:
+If verification fails, the task moves to `BLOCKED`. The runner will print a new prompt for you to copy and paste to your AI assistant. The assistant will then read the log:
 
 ```bash
 cat logs/last_run.log
 ```
 
-Then ask the AI assistant to fix the specific lint or test failure. After the fix, run the task command again:
+The AI assistant will fix the specific lint or test failure. After the fix, the assistant (or you) should run the task command again:
 
 ```bash
 npm run task T-011

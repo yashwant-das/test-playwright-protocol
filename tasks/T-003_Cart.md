@@ -1,7 +1,7 @@
 ---
 id: "T-003"
 title: "Verify Cart Functionality"
-status: "BLOCKED"
+status: "TODO"
 owner: "AI"
 priority: "High"
 dependsOn: ["T-002"]

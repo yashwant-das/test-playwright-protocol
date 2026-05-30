@@ -23,6 +23,6 @@ Target: `https://automationexercise.com/contact_us`
 
 > (See Standard DoD in AGENTS.md)
 
-- [x] Use `@playwright/mcp` (or simulate it if unavailable) to map the page.
-- [x] Upload a file during contact form submission.
-- [x] Verify success message `Success! Your details have been submitted successfully.`
+- [ ] Use `@playwright/mcp` (or simulate it if unavailable) to map the page.
+- [ ] Upload a file during contact form submission.
+- [ ] Verify success message `Success! Your details have been submitted successfully.`

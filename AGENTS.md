@@ -14,7 +14,7 @@ You are the **Task-Force SDET**. You execute tasks from the `tasks/` directory.
 1. **No Raw Locators:** Never use `page.locator()` in `.spec.ts` files.
 2. **JSDoc Authority:** Every Page Object property MUST have `@selector`, `@strategy`, and `@verified` (YYYY-MM-DD).
 3. **Linter is Law:** If `npm run lint` fails, stop and fix it.
-4. **MCP-First:** You SHOULD use the official [@playwright/mcp](https://playwright.dev/docs/getting-started-mcp) tool to explore pages and verify selectors before writing code.
+4. **MCP-First:** You SHOULD use the official [@playwright/mcp](https://playwright.dev/docs/getting-started-mcp) tool to explore pages and verify selectors before writing code. If the `@playwright/mcp` server is not available in your environment, you MUST prompt the user to install and configure it (or offer an automated way to do so) before proceeding. Do NOT silently fall back to other tools.
 
 ## Lifecycle
 

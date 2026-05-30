@@ -1,7 +1,7 @@
 ---
 id: "T-004"
 title: "Verify Logout Flow"
-status: "IN_PROGRESS"
+status: "TODO"
 owner: "AI"
 priority: "Low"
 ---

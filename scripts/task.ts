@@ -211,12 +211,19 @@ async function main() {
         ]
     });
 
-    if (command === 'next' || command === 'verify') {
+    if (command === 'next') {
         const next = getNextTask(tasks);
         if (!next) {
-            log.info('No eligible tasks found.');
+            log.info('No eligible tasks found. Resolve blocked work or add a TODO task.');
         } else {
             await processTask(next);
+        }
+    } else if (command === 'verify') {
+        const active = tasks.find(t => t.status === 'IN_PROGRESS') ?? tasks.find(t => t.status === 'BLOCKED');
+        if (!active) {
+            log.info('No active tasks to verify. Run "next" to activate a new task.');
+        } else {
+            await processTask(active);
         }
     } else if (command === 'status') {
         log.info('Task board');

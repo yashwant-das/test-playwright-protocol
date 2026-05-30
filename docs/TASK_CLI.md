@@ -191,16 +191,16 @@ If the failure is selector-related, prefer Playwright MCP exploration before cha
 
 ## AI Handoff Prompts
 
-When a task is activated or blocked, the runner prints a concise prompt for the AI assistant.
+When a task is activated or blocked, the runner prints a concise prompt for the AI assistant. This prompt is designed for you to copy and paste directly into your AI assistant's chat window.
 
 Example blocked prompt:
 
 ```text
-Task T-011 is BLOCKED.
-Ask your AI Assistant to read logs/last_run.log and fix the issues.
+Copy and paste this prompt to your AI assistant:
+"Task T-011 is now BLOCKED. Verification failed. Please read logs/last_run.log and fix the issue. Once fixed, retry: npm run task T-011"
 ```
 
-The prompt is intentionally short. Pair it with:
+The prompt contains the exact context (task ID and current state) the AI needs. Pair it with:
 
 - the task file in `tasks/`,
 - [../AGENTS.md](../AGENTS.md),
