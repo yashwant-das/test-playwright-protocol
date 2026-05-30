@@ -5,14 +5,16 @@
 [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4b32c3?logo=eslint)](https://eslint.org)
 [![Node](https://img.shields.io/badge/Node-18+-339933?logo=nodedotjs)](https://nodejs.org)
 
-**Protocol:** Smart Playwright Protocol v1.0  
-**Architecture:** File-backed task lifecycle for Playwright automation  
+**Protocol:** Smart Playwright Protocol v1.0
+**Architecture:** File-backed task lifecycle for Playwright automation
 **Objective:** Keep human-AI test automation work explicit, reviewable, and repeatable.
 
-This framework helps engineers and AI coding assistants build Playwright tests through small Markdown tasks. It combines Page Object conventions, selector documentation, lint rules, task state, and verification logs into one local workflow.
+The Smart Playwright Protocol is the operating model behind the framework. It turns Markdown task files into constrained Playwright test work, gives the human a clear handoff loop, and uses lint/test gates to prevent common automation drift.
+
+It is not a fully autonomous test-generation platform. It is a disciplined framework for managing AI-assisted Playwright implementation with task state, Page Object conventions, selector documentation, logs, and verification gates.
 
 > [!NOTE]
-> Start with this README. Use [docs/TASK_CLI.md](docs/TASK_CLI.md) when you need detailed command behavior, lifecycle rules, dependency handling, or troubleshooting notes.
+> Start with this README for setup and daily workflow. Use [docs/TASK_CLI.md](docs/TASK_CLI.md) for detailed command behavior, lifecycle rules, dependency handling, and troubleshooting.
 
 ## Documentation Map
 
@@ -24,18 +26,11 @@ This framework helps engineers and AI coding assistants build Playwright tests t
 | [tasks/template.md](tasks/template.md) | Starting point for new task files. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Shipped improvements, known gaps, and planned enhancements. |
 
-> [!TIP]
-> Keep both `README.md` and `docs/TASK_CLI.md`. The README should remain the practical onboarding guide. The task CLI doc should remain the deeper reference so the README does not become too long.
+## What This Framework Provides
 
-## How the Framework Works
+### File-Based Task State
 
-The framework uses task files as the source of truth:
-
-```text
-tasks/T-###_description-in-kebab-case.md
-```
-
-Each task moves through this lifecycle:
+Each task lives in `tasks/*.md` with frontmatter such as `status`, `title`, `owner`, and `priority`. The task file is the source of truth for the work lifecycle:
 
 ```text
 TODO -> IN_PROGRESS -> DONE
@@ -44,28 +39,66 @@ TODO -> IN_PROGRESS -> DONE
            BLOCKED
 ```
 
-The normal loop is:
+The `npm run task` command reads those files, updates task status, runs verification for active work, and writes diagnostic output to `logs/last_run.log`.
 
-1. Human creates a task in [tasks/](tasks/).
-2. Human activates the task with `npm run task next`.
-3. AI reads the task and [AGENTS.md](AGENTS.md), then writes Page Objects and specs.
-4. Human verifies the task with `npm run task <TASK_ID>`.
-5. If verification fails, AI reads `logs/last_run.log`, fixes the issue, and verification is retried.
+### Guardrails for AI-Written Tests
 
-> [!IMPORTANT]
-> The task runner only reads task files from `tasks/`. New task files must follow the `T-###_description-in-kebab-case.md` naming format.
+The project is designed around a Page Object workflow:
 
-## Prerequisites
+- Specs in `tests/**/*.spec.ts` are blocked from using raw `page.locator()` calls.
+- Page Objects in `pages/**/*.ts` are allowed to own locators.
+- Page Object properties must have JSDoc comments.
+- Selector metadata tags such as `@selector`, `@strategy`, and `@verified` are part of the project protocol and are recognized by lint rules.
+
+This keeps selectors centralized, documented, and easier to review. The current ESLint setup enforces JSDoc presence on Page Object properties and validates known JSDoc tag names; the protocol requires the selector metadata fields, but it does not yet enforce every required tag or date format as a schema.
+
+### Verification-Driven Lifecycle
+
+For `IN_PROGRESS` and `BLOCKED` tasks, the runner executes:
+
+```bash
+npm run lint
+npm test <task test file>
+```
+
+If verification passes, the task moves to `DONE`. If lint or tests fail, the task is marked or kept as `BLOCKED`, and the next instruction points the AI assistant to `logs/last_run.log`.
+
+### MCP-First Exploration Protocol
+
+The framework expects agents to use the official [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) server to inspect pages and verify selectors before implementation, especially for unknown or external pages. This is an operating rule defined in [AGENTS.md](AGENTS.md).
+
+### Commit-Time Quality Gates
+
+Husky hooks are included for local quality control:
+
+- `pre-commit` runs `npm run lint`.
+- `commit-msg` enforces Conventional Commit-style messages with automation-friendly types.
+- `.gitmessage` provides an optional commit message template.
+
+### Where It Fits
+
+Use this framework when you want:
+
+- A backlog of small, auditable UI automation tasks.
+- A repeatable way for humans and AI agents to hand work back and forth.
+- Playwright specs that avoid scattered raw selectors.
+- Page Objects with selector documentation.
+- A simple local lifecycle runner instead of a heavyweight test management system.
+- Fast feedback through lint, targeted Playwright execution, and persistent failure logs.
+
+It is intentionally small. There is no dashboard, no CI pipeline definition, no automatic selector healing, and no built-in browser exploration server. Those can be added, but the current framework focuses on a clear local protocol that is easy to inspect and extend.
+
+## Getting Started
+
+### Prerequisites
 
 Install these before using the framework:
 
 - Node.js 18 or newer.
 - npm.
-- Playwright browsers, installed during setup.
 - An AI coding environment that can read this repository and follow [AGENTS.md](AGENTS.md).
-- Optional but recommended: official [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) for selector exploration.
 
-## Installation
+### Installation
 
 Clone the repository, install dependencies, and install Playwright browsers:
 
@@ -92,20 +125,98 @@ npm test
 > [!WARNING]
 > If baseline tests fail immediately after cloning, check your Playwright browser installation and environment before creating new tasks.
 
-## Quick Start: Complete One Task
+### Configure MCP Servers
 
-### 1. Create a Task File
+> [!IMPORTANT]
+> This step is critical. The framework relies on two MCP servers. Without them, your AI assistant cannot explore pages for selectors or manage the task lifecycle through the protocol. Complete this step before starting any task work.
+
+This repository uses two MCP servers, each with a distinct purpose:
+
+| MCP Server | Purpose | Required? |
+| :--- | :--- | :--- |
+| **Official Playwright MCP** | Lets AI agents inspect live pages, explore DOM structure, and verify selectors through a real browser. | **Yes — strongly recommended** |
+| **Task Framework MCP** | Exposes task lifecycle tools (`list_tasks`, `activate_task`, `verify_task`) so agents can manage tasks programmatically. | **Yes — for full workflow** |
+
+#### Option A: Ask Your AI Assistant to Set It Up
+
+Copy and paste the following prompt into your AI assistant's chat window. It will configure both MCP servers for your IDE automatically:
+
+```text
+Please register the following MCP servers in my IDE's MCP configuration file:
+
+1. **Official Playwright MCP** (for browser exploration and selector verification):
+   "command": "npx",
+   "args": ["-y", "@playwright/mcp@latest"]
+
+2. **Task Framework MCP** (for task lifecycle management):
+   - Determine the absolute path to `mcp/server.ts` in the current workspace.
+   "command": "npx",
+   "args": ["tsx", "<ABSOLUTE_PATH_TO_mcp/server.ts>"],
+   "env": { "NODE_OPTIONS": "--disable-warning=DEP0205" }
+
+For Antigravity IDE, the config file is at `~/.gemini/antigravity-ide/mcp_config.json`.
+For Cursor, the config file is at `.cursor/mcp.json` in the project root.
+
+Read the existing config if it exists, or initialize a new one. Write the updated config and confirm once completed.
+```
+
+#### Option B: Manual Configuration
+
+Add both servers to your IDE's MCP configuration file:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "task-framework": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/repo/mcp/server.ts"],
+      "env": {
+        "NODE_OPTIONS": "--disable-warning=DEP0205"
+      }
+    }
+  }
+}
+```
+
+Replace `/absolute/path/to/repo/` with the actual path to your cloned repository.
+
+> [!CAUTION]
+> Without the Playwright MCP server, your AI assistant cannot inspect pages or verify selectors before writing tests. This leads to fragile selectors and avoidable test failures. Do not skip this step.
+
+#### Task Framework MCP Tools
+
+The task framework MCP server exposes these tools to your AI assistant:
+
+| Tool | Purpose |
+| :--- | :--- |
+| `list_tasks` | Lists all tasks with status and dependency info. Accepts an optional status filter. |
+| `activate_task` | Moves a dependency-ready `TODO` task to `IN_PROGRESS`. Enforces dependency checks. |
+| `verify_task` | Runs automated quality gates (`npm run lint` + Playwright tests) and marks the task `DONE` on success, or `BLOCKED` on failure. Logs full output to `logs/last_run.log`. |
+| `get_blocked_tasks` | Lists tasks blocked by unmet dependencies. |
+
+> [!NOTE]
+> `verify_task` enforces the same strict quality gates as `npm run task <TASK_ID>`: ESLint linting and Playwright test execution. Both the MCP server and the CLI runner are functionally equivalent for verification.
+
+You can also start the task framework MCP server manually for testing:
+
+```bash
+npm run mcp
+```
+
+## Daily Workflow
+
+This framework is built around a human-AI handshake loop. Follow these steps for every task.
+
+### 1. Create or Pick a Task
 
 Create a Markdown file in [tasks/](tasks/) using this format:
 
 ```text
 T-###_description-in-kebab-case.md
-```
-
-Example:
-
-```text
-tasks/T-011_checkout-tax.md
 ```
 
 Use [tasks/template.md](tasks/template.md) as the starting point. At minimum, include:
@@ -131,8 +242,6 @@ Example context block:
 
 ### 2. Activate the Task
 
-Run:
-
 ```bash
 npm run task next
 ```
@@ -145,21 +254,21 @@ The runner selects work in this order:
 
 When a `TODO` task is selected, the runner moves it to `IN_PROGRESS` and prints a prompt for your AI assistant.
 
-### 3. Ask the AI Assistant to Implement
+### 3. Hand Off to the AI Assistant
 
 Give the printed prompt to your AI assistant. The assistant should:
 
 - Read [AGENTS.md](AGENTS.md).
 - Read the active task file.
-- Explore selectors, preferably with Playwright MCP.
+- **Explore selectors using Playwright MCP** before writing any Page Object code.
 - Add or update Page Objects in `pages/`.
 - Add or update Playwright specs in `tests/`.
 - Avoid raw `page.locator()` calls in `.spec.ts` files.
-- Keep selectors documented in Page Objects.
+- Keep selectors documented in Page Objects with `@selector`, `@strategy`, and `@verified`.
 
 ### 4. Verify the Task
 
-When implementation is ready, run:
+When the AI assistant finishes implementation, run:
 
 ```bash
 npm run task T-011
@@ -215,6 +324,25 @@ readonly loginButton = this.page.getByRole('button', { name: 'Login' });
 > [!WARNING]
 > The project protocol requires `@selector`, `@strategy`, and `@verified` on Page Object properties. Current linting checks JSDoc presence and accepted tag names; stricter required-tag and date-format validation is tracked in [docs/ROADMAP.md](docs/ROADMAP.md).
 
+## Regulations
+
+These rules are defined in [AGENTS.md](AGENTS.md) and backed by linting where possible.
+
+1. **No raw locators in specs:** Do not use `page.locator()` in `.spec.ts` files.
+2. **Page Object selector documentation:** Page Object properties must document selectors with `@selector`, `@strategy`, and `@verified`.
+3. **Lint before completion:** `npm run lint` must pass before a task can be marked `DONE`.
+4. **MCP-first exploration:** Use Playwright MCP to explore pages and validate selectors when available.
+5. **Failure diagnosis:** If verification fails, read `logs/last_run.log` before changing code.
+
+## Lifecycle Rules
+
+| Current Status | Runner Behavior | Success Outcome | Failure Outcome |
+| :--- | :--- | :--- | :--- |
+| `TODO` | Marks the task `IN_PROGRESS` and prints the AI instruction. | `IN_PROGRESS` | N/A |
+| `IN_PROGRESS` | Runs lint and the declared task test. | `DONE` | `BLOCKED` |
+| `BLOCKED` | Re-runs lint and the declared task test after fixes. | `DONE` | Remains `BLOCKED` |
+| `DONE` | Re-verifies lint and the declared task test if present. | Remains `DONE` | `BLOCKED` |
+
 ## Best Practices for AI-Assisted Work
 
 Use AI for implementation, selector mapping, and failure repair, but keep the lifecycle explicit:
@@ -241,34 +369,21 @@ Use AI for implementation, selector mapping, and failure repair, but keep the li
 
 Run `npm run task` without arguments to open the interactive menu. See [docs/TASK_CLI.md](docs/TASK_CLI.md) for the menu example and detailed command behavior.
 
-## MCP Setup
+## Task File Convention
 
-This repository includes a custom task lifecycle MCP server in [mcp/server.ts](mcp/server.ts). It is separate from the official Playwright MCP server.
+Preferred task filenames follow:
 
-| MCP Server | Purpose |
-| :--- | :--- |
-| Repository task MCP | Exposes task lifecycle actions such as activating tasks and listing blocked tasks. |
-| Official Playwright MCP | Lets agents inspect pages and verify selectors through a browser. |
-
-Example Cursor configuration:
-
-```json
-{
-  "mcpServers": {
-    "task-framework": {
-      "command": "npx",
-      "args": ["tsx", "/absolute/path/to/repo/mcp/server.ts"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
+```text
+T-###_description-in-kebab-case.md
 ```
 
-> [!CAUTION]
-> The task MCP server includes a `verifyTask` tool that manually marks a task `DONE`. It bypasses lint and test execution. Prefer `npm run task <TASK_ID>` for normal completion.
+Examples:
+
+- `T-001_login-navigation.md`
+- `T-007_checkout-step1.md`
+- `T-010_external-test.md`
+
+The runner resolves tasks case-insensitively by ID prefix, so existing task files with uppercase words still run. New task files should use lowercase kebab-case descriptions to match the protocol.
 
 ## Project Structure
 
@@ -336,16 +451,27 @@ npm run lint
 
 Fix code or Markdown issues before continuing. The framework treats lint as a completion gate.
 
+### MCP Server Does Not Start
+
+Test the task framework MCP server manually:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1"}}}' | npm run mcp
+```
+
+If the server responds with a JSON-RPC result containing `serverInfo`, it is working. If your IDE still does not show the MCP tools, restart the IDE session after updating the MCP configuration.
+
 ## Current Scope
 
 The repository currently provides:
 
-- A file-backed task lifecycle runner.
-- AI agent instructions.
+- A file-backed task lifecycle runner in [scripts/task.ts](scripts/task.ts).
+- AI agent instructions in [AGENTS.md](AGENTS.md).
 - Playwright Page Object guardrails.
 - ESLint and markdownlint quality gates.
 - A selector health check for Page Objects.
 - A custom task lifecycle MCP server.
 - A task backlog and sample completed login navigation flow.
+- Playwright configured for Chromium by default, with Firefox and WebKit examples commented in [playwright.config.ts](playwright.config.ts).
 
-It does not currently provide a dashboard, CI workflow, automatic selector healing, or complete JSDoc metadata schema validation.
+This makes the framework useful as a local AI-assisted SDET workflow today, while leaving clear extension points for stricter JSDoc schema checks, CI integration, dashboards, richer task metadata, and cross-browser expansion.

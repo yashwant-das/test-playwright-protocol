@@ -48,21 +48,34 @@ async function runCmd(command: string): Promise<void> {
 
 function getAllTasks(): (Task & { file: string, content: string })[] {
     const files = fs.readdirSync(TASKS_DIR).filter(f => f.endsWith('.md') && f !== 'template.md');
-    return files.map(f => {
-        const content = fs.readFileSync(path.join(TASKS_DIR, f), 'utf8');
-        const parsed = fm<Task>(content);
-        return {
-            ...parsed.attributes,
-            id: f.split('_')[0],
-            file: f,
-            content
-        };
-    });
+    const tasks: (Task & { file: string, content: string })[] = [];
+    for (const f of files) {
+        const filePath = path.join(TASKS_DIR, f);
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const parsed = fm<Task>(content);
+            tasks.push({
+                ...parsed.attributes,
+                id: f.split('_')[0],
+                file: f,
+                content
+            });
+        } catch (err: any) {
+            console.error(pc.red(`\n[Error] Failed to parse front-matter in ${pc.bold(f)}:`));
+            console.error(pc.red(err.message || err));
+            console.error(pc.yellow(`Please check that the YAML syntax is correct in tasks/${f}.\n`));
+            process.exit(1);
+        }
+    }
+    return tasks;
 }
 
 function getNextTask(tasks: (Task & { file: string, content: string })[]) {
     const inProgress = tasks.find(t => t.status === 'IN_PROGRESS');
     if (inProgress) return inProgress;
+
+    const blocked = tasks.find(t => t.status === 'BLOCKED');
+    if (blocked) return blocked;
 
     const done = new Set(tasks.filter(t => t.status === 'DONE').map(t => t.id));
     return tasks
@@ -94,7 +107,7 @@ async function processTask(task: Task & { file: string, content: string }) {
             updateTaskStatus(filePath, task.content, 'IN_PROGRESS');
             
             note(
-                `Task ${actualTaskId} is now IN_PROGRESS.\nAsk your AI assistant to read AGENTS.md and tasks/${task.file}, then implement the requirements.`,
+                `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now IN_PROGRESS. Please read AGENTS.md and tasks/${task.file}, then implement the requirements."`,
                 theme.noteTitle('AI handoff')
             );
         }
@@ -144,7 +157,7 @@ async function processTask(task: Task & { file: string, content: string }) {
         log.error(theme.error('Verification failed.'));
         updateTaskStatus(filePath, task.content, 'BLOCKED');
         note(
-            `Task ${actualTaskId} is now BLOCKED.\nAsk your AI assistant to read logs/last_run.log and fix the issue.\nOnce fixed, retry: npm run task ${actualTaskId}`,
+            `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now BLOCKED. Verification failed. Please read logs/last_run.log and fix the issue. Once fixed, retry: npm run task ${actualTaskId}"`,
             theme.noteTitle('Repair required')
         );
     }

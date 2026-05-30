@@ -3,7 +3,7 @@
 `scripts/task.ts` is the local CLI that moves Markdown task files through the framework lifecycle. Use this document when you need exact command behavior, status transitions, dependency rules, verification details, and failure recovery guidance.
 
 > [!NOTE]
-> For first-time setup and the end-to-end user workflow, start with [README.md](../README.md). This file is the deeper task runner reference.
+> For first-time setup, MCP server configuration, and the end-to-end user workflow, start with [README.md](../README.md). This file is the deeper task runner reference.
 
 ## What the Runner Owns
 
@@ -17,44 +17,6 @@ The runner is responsible for:
 - Printing handoff prompts for AI-assisted implementation or repair.
 
 The runner does not write Page Objects, generate tests, inspect web pages, or replace human review. Those responsibilities stay with the human and AI assistant workflow.
-
-## Required Task File Shape
-
-Task files must live in [../tasks](../tasks) and follow this filename format:
-
-```text
-T-###_description-in-kebab-case.md
-```
-
-Example:
-
-```text
-tasks/T-011_checkout-tax.md
-```
-
-The runner derives the task ID from the filename prefix, such as `T-011`.
-
-Required frontmatter for normal use:
-
-```yaml
----
-id: "T-011"
-title: "Verify Checkout Tax"
-status: "TODO"
-owner: "AI"
-priority: "High"
-dependsOn: []
----
-```
-
-For verification, the task body should include a context line for the test file:
-
-```markdown
-- **Test File:** `tests/checkout.spec.ts`
-```
-
-> [!WARNING]
-> If the `- **Test File:**` line is missing, the runner cannot verify an active task and will mark it `BLOCKED`.
 
 ## Commands
 
@@ -93,6 +55,44 @@ Available menu actions:
 | `Verify current active task` | Runs verification for the current active task. |
 | `Show task board` | Prints all task IDs, titles, and statuses. |
 | `Show blocked tasks` | Lists tasks currently marked `BLOCKED`. |
+
+## Required Task File Shape
+
+Task files must live in [../tasks](../tasks) and follow this filename format:
+
+```text
+T-###_description-in-kebab-case.md
+```
+
+Example:
+
+```text
+tasks/T-011_checkout-tax.md
+```
+
+The runner derives the task ID from the filename prefix, such as `T-011`.
+
+Required frontmatter for normal use:
+
+```yaml
+---
+id: "T-011"
+title: "Verify Checkout Tax"
+status: "TODO"
+owner: "AI"
+priority: "High"
+dependsOn: []
+---
+```
+
+For verification, the task body should include a context line for the test file:
+
+```markdown
+- **Test File:** `tests/checkout.spec.ts`
+```
+
+> [!WARNING]
+> If the `- **Test File:**` line is missing, the runner cannot verify an active task and will mark it `BLOCKED`.
 
 ## Task Selection Order
 
@@ -208,18 +208,78 @@ The prompt is intentionally short. Pair it with:
 
 ## MCP Relationship
 
-The repository includes a task lifecycle MCP server in `mcp/server.ts`.
+The repository includes two MCP servers, each serving a distinct purpose.
+
+### Official Playwright MCP
+
+The official [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) server lets AI agents inspect live browser pages, explore DOM structure, and verify selectors. It is the recommended tool for selector discovery before writing or updating Page Objects.
+
+> [!IMPORTANT]
+> The framework protocol requires MCP-first exploration. AI agents should use Playwright MCP to verify selectors before implementation, especially for unknown or external pages. See [AGENTS.md](../AGENTS.md) for the full rule set.
+
+### Task Framework MCP
+
+The custom task framework MCP server in `mcp/server.ts` exposes task lifecycle tools:
 
 | Tool | Purpose |
 | :--- | :--- |
-| `activateTask` | Moves a dependency-ready task to `IN_PROGRESS`. |
-| `verifyTask` | Marks a task `DONE` manually. |
-| `getBlockedTasks` | Lists tasks blocked by unmet dependencies. |
+| `list_tasks` | Lists all tasks with status and dependency info. Accepts an optional status filter. |
+| `activate_task` | Moves a dependency-ready `TODO` task to `IN_PROGRESS`. Enforces dependency checks. |
+| `verify_task` | Runs automated quality gates (`npm run lint` + Playwright tests) and marks the task `DONE` on success, or `BLOCKED` on failure. Logs full output to `logs/last_run.log`. |
+| `get_blocked_tasks` | Lists tasks blocked by unmet dependencies (kept for backward compatibility). |
 
-> [!WARNING]
-> `verifyTask` bypasses automated lint and Playwright verification. Use `npm run task <TASK_ID>` for normal completion.
+> [!NOTE]
+> `verify_task` enforces the same strict quality gates as `npm run task <TASK_ID>`: ESLint linting and Playwright test execution. Both the MCP server and the CLI runner are functionally equivalent for verification.
 
-The official Playwright MCP server has a different purpose: browser exploration and selector verification. It should be used by AI agents before writing or changing selectors when page structure is unknown.
+### Automated Setup Prompt
+
+If you want the AI assistant to configure both MCP servers for you automatically, copy and paste the following prompt into your AI assistant's chat window:
+
+```text
+Please register the following MCP servers in my IDE's MCP configuration file:
+
+1. **Official Playwright MCP** (for browser exploration and selector verification):
+   "command": "npx",
+   "args": ["-y", "@playwright/mcp@latest"]
+
+2. **Task Framework MCP** (for task lifecycle management):
+   - Determine the absolute path to `mcp/server.ts` in the current workspace.
+   "command": "npx",
+   "args": ["tsx", "<ABSOLUTE_PATH_TO_mcp/server.ts>"],
+   "env": { "NODE_OPTIONS": "--disable-warning=DEP0205" }
+
+For Antigravity IDE, the config file is at `~/.gemini/antigravity-ide/mcp_config.json`.
+For Cursor, the config file is at `.cursor/mcp.json` in the project root.
+
+Read the existing config if it exists, or initialize a new one. Write the updated config and confirm once completed.
+```
+
+### Manual Configuration
+
+Add both servers to your IDE's MCP configuration file:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "task-framework": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/repo/mcp/server.ts"],
+      "env": {
+        "NODE_OPTIONS": "--disable-warning=DEP0205"
+      }
+    }
+  }
+}
+```
+
+Replace `/absolute/path/to/repo/` with the actual path to your cloned repository.
+
+> [!CAUTION]
+> Without the Playwright MCP server, your AI assistant cannot inspect pages or verify selectors before writing tests. This leads to fragile selectors and avoidable test failures. Do not skip this configuration.
 
 ## Common Runner Problems
 
@@ -252,11 +312,21 @@ Check for:
 - unmet `dependsOn` entries,
 - filename ordering among eligible `TODO` tasks.
 
+### MCP Server Does Not Start
+
+Test the task framework MCP server manually:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1"}}}' | npm run mcp
+```
+
+If the server responds with a JSON-RPC result containing `serverInfo`, it is working. If your IDE still does not show the MCP tools, restart the IDE session after updating the MCP configuration.
+
 ## Related Files
 
 | File | Purpose |
 | :--- | :--- |
-| [../README.md](../README.md) | End-user setup and workflow guide. |
+| [../README.md](../README.md) | End-user setup, MCP configuration, and workflow guide. |
 | [../AGENTS.md](../AGENTS.md) | AI implementation rules and completion format. |
 | [../tasks/template.md](../tasks/template.md) | Template for new tasks. |
 | [../scripts/task.ts](../scripts/task.ts) | Task runner implementation. |
