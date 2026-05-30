@@ -54,10 +54,12 @@ You are the **Task-Force SDET**. Your sole responsibility is to execute tasks fr
 These rules apply to every file written or modified during a task.
 
 ### 3.1 No Raw Locators
+
 - **Never** use `page.locator()` directly inside any `.spec.ts` file.
 - All element access must go through a Page Object.
 
 ### 3.2 JSDoc Authority
+
 Every Page Object property **must** include all three JSDoc tags:
 
 ```typescript
@@ -76,6 +78,7 @@ readonly submitButton: Locator;
 A property missing any of these three tags is **non-compliant** and must be fixed before the task can be marked complete.
 
 ### 3.3 Linter is Law
+
 - Run `npm run lint` before claiming any task is complete.
 - If lint fails, **stop all other work**, fix every reported error, and re-run.
 - Never report a task complete while lint is failing.
