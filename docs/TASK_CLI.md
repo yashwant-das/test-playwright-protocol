@@ -197,13 +197,17 @@ Example blocked prompt:
 
 ```text
 Copy and paste this prompt to your AI assistant:
-"Task T-011 is now BLOCKED. Verification failed. Please read logs/last_run.log and fix the issue. Once fixed, retry: npm run task T-011"
+"Task T-011 is now BLOCKED. Verification failed.
+
+First, read AGENTS.md — it defines the full lifecycle protocol you must follow.
+Then check logs/last_run.log to diagnose the failure.
+Fix the issue and retry: npm run task T-011"
 ```
 
 The prompt contains the exact context (task ID and current state) the AI needs. Pair it with:
 
 - the task file in `tasks/`,
-- [../AGENTS.md](../AGENTS.md),
+- [../AGENTS.md](../AGENTS.md) (the AI will read the MCP pre-flight check before proceeding),
 - `logs/last_run.log` when blocked.
 
 ## MCP Relationship

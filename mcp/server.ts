@@ -206,7 +206,7 @@ server.tool(
             return textResponse(
                 [
                     'Copy and paste this prompt to your AI assistant:',
-                    `"Task ${taskId} is now IN_PROGRESS. Please read AGENTS.md and tasks/${target.file}, then implement the requirements. Once implemented, call verify_task to run quality gates."`
+                    `"Task ${taskId} is now IN_PROGRESS. Read AGENTS.md then tasks/${target.file}, implement, and call verify_task."`
             ].join('\n'),
         );
     },

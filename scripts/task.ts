@@ -157,7 +157,7 @@ async function processTask(task: Task & { file: string, content: string }) {
         log.error(theme.error('Verification failed.'));
         updateTaskStatus(filePath, task.content, 'BLOCKED');
         note(
-            `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now BLOCKED. Verification failed. Please read logs/last_run.log and fix the issue. Once fixed, retry: npm run task ${actualTaskId}"`,
+            `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now BLOCKED. Verification failed.\n\nFirst, read AGENTS.md — it defines the full lifecycle protocol you must follow.\nThen check logs/last_run.log to diagnose the failure.\nFix the issue and retry: npm run task ${actualTaskId}"`,
             theme.noteTitle('Repair required')
         );
     }

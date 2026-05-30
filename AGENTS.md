@@ -11,16 +11,22 @@ You are the **Task-Force SDET**. You execute tasks from the `tasks/` directory.
 
 ## Regulations
 
-1. **No Raw Locators:** Never use `page.locator()` in `.spec.ts` files.
-2. **JSDoc Authority:** Every Page Object property MUST have `@selector`, `@strategy`, and `@verified` (YYYY-MM-DD).
-3. **Linter is Law:** If `npm run lint` fails, stop and fix it.
-4. **MCP-First:** You SHOULD use the official [@playwright/mcp](https://playwright.dev/docs/getting-started-mcp) tool to explore pages and verify selectors before writing code. If the `@playwright/mcp` server is not available in your environment, you MUST prompt the user to install and configure it (or offer an automated way to do so) before proceeding. Do NOT silently fall back to other tools.
+1. **MCP-First — Required Pre-Flight Check:** Before writing any code, you MUST verify that both MCP servers listed below are available in your environment. If either is missing, you MUST stop, refuse to proceed, and tell the user to install and configure it (see README.md §"Configure MCP Servers"). Do NOT fall back to other tools and do NOT attempt workarounds.
+
+   | Required MCP Server | Purpose |
+   | :--- | :--- |
+   | **Official Playwright MCP** (`@playwright/mcp`) | Browser exploration and selector verification. |
+   | **Task Framework MCP** (`mcp/server.ts`) | Task lifecycle tools (`list_tasks`, `activate_task`, `verify_task`). |
+
+2. **No Raw Locators:** Never use `page.locator()` in `.spec.ts` files.
+3. **JSDoc Authority:** Every Page Object property MUST have `@selector`, `@strategy`, and `@verified` (YYYY-MM-DD).
+4. **Linter is Law:** If `npm run lint` fails, stop and fix it.
 
 ## Lifecycle
 
 *(For a deep dive into how the CLI works, see [docs/TASK_CLI.md](docs/TASK_CLI.md))*
 
-- **TODO** → **IN_PROGRESS**: Read task, map pages, write tests.
+- **TODO** → **IN_PROGRESS**: Read AGENTS.md, do the MCP pre-flight check, then read the task, map pages, write tests.
 - **IN_PROGRESS** → **DONE**: Run `npm run task <TASK_ID>`. (System runs `lint` && `test`).
 - **VERIFICATION FAIL** → **BLOCKED**: Read `logs/last_run.log`, fix code/selectors, and retry `npm run task <TASK_ID>`.
 
