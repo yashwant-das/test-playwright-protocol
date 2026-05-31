@@ -141,7 +141,7 @@ Playwright MCP is the **recommended** mechanism for browser exploration and sele
 
 #### 6. Lifecycle Management Layer (Optional)
 
-The **Task Framework MCP** (located in `mcp/server.ts`) is an **optional and experimental** component. It provides tools for programmatic task activation and verification within AI-assisted IDEs. Most users will interact directly with task files and the CLI.
+The **SPP Lifecycle MCP** (located in `mcp/server.ts`) is an **optional and experimental** component. It provides tools for programmatic task activation and verification within AI-assisted IDEs. Most users will interact directly with task files and the CLI.
 
 ---
 
@@ -539,7 +539,6 @@ PROTOCOL.md
 CLI.md
 ROADMAP.md
 AGENTS.md
- 
 ```
 
 Purpose:

@@ -76,7 +76,7 @@ Paste the copied prompt into your AI assistant. The assistant will:
 Once the AI finishes, run the verification gate:
 
 ```bash
-npm run task T-###
+npm run task T-001
 ```
 
 ## Documentation

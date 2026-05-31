@@ -12,7 +12,7 @@ import { Task } from '../types/task';
 // ---------------------------------------------------------------------------
 
 const server = new McpServer({
-    name: 'task-framework (Optional/Experimental)',
+    name: 'smart-playwright-protocol',
     version: '2.0.0',
 });
 
@@ -26,7 +26,7 @@ const LOG_FILE = path.join(LOG_DIR, 'last_run.log');
 // ---------------------------------------------------------------------------
 
 function log(msg: string): void {
-    console.error(`[task-framework] ${msg}`);
+    console.error(`[spp-protocol] ${msg}`);
 }
 
 function logToFile(msg: string): void {
@@ -529,7 +529,7 @@ server.tool(
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    log('Task-framework MCP server connected and ready.');
+    log('Smart Playwright Protocol MCP server connected and ready.');
 }
 
 main().catch((err) => {

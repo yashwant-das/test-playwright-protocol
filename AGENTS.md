@@ -17,7 +17,7 @@ Before starting any work:
 
 1. Read the Protocol: Read and follow [docs/PROTOCOL.md](docs/PROTOCOL.md) as the architectural source of truth.
 2. Read the Task: Read the active task file in the `tasks/` directory.
-3. **Check MCP Servers:** It is recommended to use the **Official Playwright MCP** for browser exploration.
+3. Check MCP Servers: It is recommended to use the **Official Playwright MCP** for browser exploration.
 
 ## Workflow Guidance
 
@@ -25,7 +25,6 @@ You MUST strictly adhere to the lifecycle: **Select → Understand → Explore �
 
 - **Understand:** Do not begin implementation until the "Understanding" section of the task is complete.
 - **Explore:** Use Playwright MCP (if available) or manual exploration to verify selectors live in the browser.
-
 - **Implement:** Follow repository coding standards (Page Objects, no raw locators).
 - **Verify:** Run `npm run task <TASK_ID>` to verify your work.
 

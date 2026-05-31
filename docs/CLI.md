@@ -105,12 +105,12 @@ Used for browser exploration and selector validation.
 }
 ```
 
-### Task Framework MCP (Optional / Experimental)
+### SPP Lifecycle MCP (Optional / Experimental)
 
 Provides tools for programmatic task lifecycle management.
 
 ```json
-"task-framework": {
+"spp-protocol": {
   "command": "npx",
   "args": ["tsx", "/absolute/path/to/repo/mcp/server.ts"],
   "env": {
@@ -130,7 +130,7 @@ Please register the following MCP servers in my IDE's MCP configuration file:
    "command": "npx",
    "args": ["-y", "@playwright/mcp@latest"]
 
-2. **Task Framework MCP** (for task lifecycle management):
+2. **SPP Lifecycle MCP** (for task lifecycle management):
    - Determine the absolute path to `mcp/server.ts` in the current workspace.
    "command": "npx",
    "args": ["tsx", "<ABSOLUTE_PATH_TO_mcp/server.ts>"],
@@ -153,7 +153,7 @@ Add both servers to your IDE's MCP configuration file:
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"]
     },
-    "task-framework": {
+    "spp-protocol": {
       "command": "npx",
       "args": ["tsx", "/absolute/path/to/repo/mcp/server.ts"],
       "env": {
@@ -179,7 +179,7 @@ Ensure the task body includes exactly one line like this:
 
 ### MCP Server Does Not Start
 
-Test the task framework MCP server manually:
+Test the **SPP Lifecycle MCP** server manually:
 
 ```bash
 echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"0.1"}}}' | npm run mcp
@@ -193,6 +193,5 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 | [PROTOCOL.md](PROTOCOL.md) | **Architectural source of truth**: workflow, states, and rules. |
 | [ROADMAP.md](ROADMAP.md) | Future enhancements and planned improvements. |
 | [../AGENTS.md](../AGENTS.md) | Lightweight instructions for AI assistants. |
-| [../tasks/template.md](../tasks/template.md) | Template for new tasks. |
 | [../scripts/task.ts](../scripts/task.ts) | Task runner implementation. |
-| [../mcp/server.ts](../mcp/server.ts) | Custom task lifecycle MCP server. |
+| [../mcp/server.ts](../mcp/server.ts) | Custom protocol lifecycle MCP server. |
