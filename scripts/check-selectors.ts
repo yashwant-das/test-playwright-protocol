@@ -1,8 +1,7 @@
-import { Project, SyntaxKind, CallExpression, PropertyDefinition } from 'ts-morph';
+import { Project, SyntaxKind, CallExpression, PropertyDeclaration } from 'ts-morph';
 import pc from 'picocolors';
 
 const project = new Project({ tsConfigFilePath: 'tsconfig.json' });
-// According to package.json and eslintrc, page objects are in pages/**/*.ts
 const pageObjects = project.getSourceFiles('pages/**/*.ts');
 
 const violations: string[] = [];
@@ -26,11 +25,12 @@ function isARIALocator(call: CallExpression): boolean {
     return validMethods.some(method => expr.includes(`.${method}`));
 }
 
-function checkVerificationDate(prop: PropertyDefinition) {
+function checkVerificationDate(prop: PropertyDeclaration) {
     const jsdocs = prop.getJsDocs();
     if (jsdocs.length === 0) return;
 
-    const verifiedTag = jsdocs[0].getTags().find(tag => tag.getTagName() === 'verified');
+    const tags = jsdocs[0].getTags();
+    const verifiedTag = tags.find(tag => tag.getTagName() === 'verified');
     if (!verifiedTag) return;
 
     const dateStr = verifiedTag.getCommentText()?.trim();
@@ -57,7 +57,7 @@ for (const file of pageObjects) {
       );
     });
 
-  file.getDescendantsOfKind(SyntaxKind.PropertyDefinition)
+  file.getDescendantsOfKind(SyntaxKind.PropertyDeclaration)
     .forEach(checkVerificationDate);
 }
 
