@@ -15,11 +15,6 @@ node_modules/
 /dist/
 /out/
 
-# --- Agent-generated ---
-# /pages/
-# /tests/
-# /tasks/
-
 # --- Testing & Playwright ---
 /blob-report/
 /playwright-report/
@@ -32,6 +27,7 @@ results.xml
 test-results.json
 
 # --- Logs ---
+/logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -58,6 +54,3 @@ lint_output.txt
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-
-last_run.log
