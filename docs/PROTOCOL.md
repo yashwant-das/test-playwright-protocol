@@ -499,6 +499,37 @@ Future enhancements:
 
 ---
 
+## Commit Conventions
+
+The repository enforces a structured commit message format to ensure history remains readable and compatible with automated tooling.
+
+### Format
+
+```text
+<type>(<optional-scope>): <subject>
+```
+
+### Supported Types
+
+- **feat**: New feature or capability.
+- **fix**: Bug fix or correction.
+- **refactor**: Code change that neither fixes a bug nor adds a feature.
+- **test**: Adding or updating tests.
+- **docs**: Documentation changes.
+- **chore**: Maintenance tasks, small cleanups.
+- **build**: Dependencies, tooling, package, or infrastructure updates.
+- **arch**: Architectural changes or protocol updates.
+- **heal**: Selector repair or automation healing.
+
+### Examples
+
+- `feat(cli): add task generator`
+- `fix(tasks): handle blocked task parsing`
+- `build(deps): upgrade playwright`
+- `heal(selectors): repair checkout locator`
+
+---
+
 ## SPP v2 Scope
 
 ### Included
