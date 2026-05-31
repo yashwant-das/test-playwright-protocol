@@ -504,8 +504,7 @@ Future enhancements:
 The framework maintains five primary documents.
 
 ```text
-README.md PROTOCOL.md TASK_CLI.md ROADMAP.md AGENTS.md 
-```
+README.md PROTOCOL.md CLI.md ROADMAP.md AGENTS.md 
 
 Purpose:
 
@@ -521,7 +520,7 @@ PROTOCOL.md
 - states
 - rules
 
-TASK_CLI.md
+CLI.md
 
 - commands
 - troubleshooting
@@ -573,3 +572,41 @@ A task may move to DONE only when:
 Verification remains the final authority.
 
 Code written without successful verification is not considered complete.
+
+---
+
+## Agent Completion Protocol
+
+AI assistants must use the following format when reporting task completion or blocks. This format is recognized by the protocol.
+
+### 1. Success Response
+
+Use this format only when all verification gates pass:
+
+```text
+Task <TASK_ID> Complete ✓
+Summary:
+✅ Created <PageObject> with JSDoc
+✅ Created <TestFile> verifying <Requirement>
+✅ No raw locators used
+✅ lint passed
+✅ tests passed
+All acceptance criteria met.
+
+👉 Next Step: Run `npm run task <TASK_ID>`
+```
+
+### 2. Blocked Response
+
+Use this format when verification fails or the task cannot proceed:
+
+```text
+Task <TASK_ID> Blocked
+Summary:
+- <What was attempted>
+- <What failed or remains incomplete>
+- <Relevant command that failed>
+
+Required next step:
+Read `logs/last_run.log`, fix the issue, and retry `npm run task <TASK_ID>`.
+```
