@@ -157,12 +157,102 @@ function textResponse(text: string) {
 }
 
 // ---------------------------------------------------------------------------
+// Tool: create_task
+// ---------------------------------------------------------------------------
+
+server.tool(
+    'create_task',
+    'Generate a new SPP v2.0 compliant task file in the tasks/ directory. This tool ensures consistent task structure and metadata.',
+    {
+        taskId: z
+            .string()
+            .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-012)')
+            .describe('The unique task ID, e.g. T-012'),
+        title: z
+            .string()
+            .min(1)
+            .describe('Descriptive title for the task'),
+        pageObject: z
+            .string()
+            .optional()
+            .describe('The name of the target Page Object (e.g. CheckoutPage)'),
+        testFile: z
+            .string()
+            .optional()
+            .describe('The target spec file path (e.g. tests/checkout.spec.ts)'),
+        url: z
+            .string()
+            .optional()
+            .describe('The entry point URL for the test'),
+        acceptanceCriteria: z
+            .string()
+            .optional()
+            .describe('Comma-separated list of requirements'),
+        dependsOn: z
+            .array(z.string())
+            .optional()
+            .describe('Optional list of task IDs that must be DONE first'),
+    },
+    async ({ taskId, title, pageObject, testFile, url, acceptanceCriteria, dependsOn }) => {
+        log(`create_task called for ${taskId}`);
+
+        const kebabTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const filename = `${taskId}_${kebabTitle}.md`;
+        const filePath = path.join(TASKS_DIR, filename);
+
+        if (fs.existsSync(filePath)) {
+            return errorResponse(`Task file already exists: ${filename}`);
+        }
+
+        const acList = acceptanceCriteria
+            ? acceptanceCriteria.split(',').map(s => `- [ ] ${s.trim()}`).join('\n')
+            : '- [ ] ';
+
+        const content = `---
+id: "${taskId}"
+title: "${title}"
+status: "TODO"
+dependsOn: ${JSON.stringify(dependsOn || [])}
+---
+
+${taskId}: ${title}
+
+## Understanding
+
+Feature:
+Expected Behavior:
+Business Outcome:
+Risk:
+
+## Context
+
+- **Page Object:** ${pageObject ? `\`pages/${pageObject.endsWith('.ts') ? pageObject : pageObject + '.ts'}\`` : ''}
+- **Test File:** ${testFile ? `\`${testFile.endsWith('.spec.ts') ? testFile : testFile + '.spec.ts'}\`` : ''}
+- **URL:** ${url || ''}
+
+## Implementation Plan
+
+1.
+2.
+3.
+
+## Acceptance Criteria
+
+${acList}
+`;
+
+        fs.writeFileSync(filePath, content);
+        return textResponse(`Successfully created task: ${taskId} (${filename})\n\nNext Step:\nCall activate_task with taskId ${taskId}.`);
+    }
+);
+
+// ---------------------------------------------------------------------------
 // Tool: activate_task
 // ---------------------------------------------------------------------------
 
 server.tool(
     'activate_task',
-    'Transition a task from TODO to IN_PROGRESS. Checks that all tasks listed in dependsOn are DONE before allowing activation. Returns an error if the task has unmet dependencies.',
+    'Phase 1 (Select): Transition a task from TODO to IN_PROGRESS. Checks dependencies before allowing activation.',
     {
         taskId: z
             .string()
@@ -204,7 +294,21 @@ server.tool(
         );
 
         return textResponse(
-            `Task ${taskId} is now IN_PROGRESS. Please read AGENTS.md, then read tasks/${target.file}, implement the requirements, and finally call verify_task.`
+            [
+                `Task ${taskId} is now IN_PROGRESS.`,
+                '',
+                'Follow the Smart Playwright Protocol (SPP):',
+                '1. Understand: Fill out the "Understanding" section in the task file.',
+                '2. Explore: Use Playwright MCP to verify selectors.',
+                '3. Plan: Draft an "Implementation Plan" in the task file.',
+                '4. Implement: Write Page Objects and tests.',
+                '',
+                `Task file: tasks/${target.file}`,
+                'Source of truth: docs/PROTOCOL.md',
+                '',
+                'Next Step:',
+                'Begin Phase 2 (Understand) by editing the task file.'
+            ].join('\n')
         );
     },
 );
@@ -320,7 +424,7 @@ server.tool(
 
 server.tool(
     'list_tasks',
-    'List all tasks with their current status, title, and dependency information. Optionally filter by status. Use this to get a full overview of the task board.',
+    'List all tasks with their current status, title, and dependency information. Use this to get a full overview of the project task board.',
     {
         status: z
             .enum(['TODO', 'IN_PROGRESS', 'DONE', 'BLOCKED'])
@@ -340,11 +444,20 @@ server.tool(
             ? allTasks.filter((t) => t.status === status)
             : allTasks;
 
+        const summary = {
+            TODO: allTasks.filter(t => t.status === 'TODO').length,
+            IN_PROGRESS: allTasks.filter(t => t.status === 'IN_PROGRESS').length,
+            BLOCKED: allTasks.filter(t => t.status === 'BLOCKED').length,
+            DONE: allTasks.filter(t => t.status === 'DONE').length,
+        };
+
         if (tasks.length === 0) {
             return textResponse(
-                status
-                    ? `No tasks with status ${status}.`
-                    : 'No tasks found.',
+                [
+                    `Task Board Summary: TODO: ${summary.TODO} | IN_PROGRESS: ${summary.IN_PROGRESS} | BLOCKED: ${summary.BLOCKED} | DONE: ${summary.DONE}`,
+                    '',
+                    status ? `No tasks with status ${status}.` : 'No tasks found.'
+                ].join('\n')
             );
         }
 
@@ -361,7 +474,13 @@ server.tool(
             return `[${t.id}] ${t.title} (${t.status})${reason}${depInfo}`;
         });
 
-        return textResponse(lines.join('\n'));
+        return textResponse(
+            [
+                `Task Board Summary: TODO: ${summary.TODO} | IN_PROGRESS: ${summary.IN_PROGRESS} | BLOCKED: ${summary.BLOCKED} | DONE: ${summary.DONE}`,
+                '',
+                ...lines
+            ].join('\n')
+        );
     },
 );
 
