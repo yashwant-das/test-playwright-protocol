@@ -282,9 +282,11 @@ server.tool(
                 [
                     `Task ${taskId} passed all quality gates and is now DONE.`,
                     '',
-                    'Gates passed:',
-                    '  ✓ ESLint (lint:code + lint:md)',
-                    `  ✓ Playwright tests (${testFile})`,
+                    'Verification Summary:',
+                    '  ✓ lint passed',
+                    `  ✓ tests passed (${testFile})`,
+                    '  ✓ no focused tests',
+                    '  ✓ no hard waits detected',
                     notes ? `\nNotes: ${notes}` : '',
                 ]
                     .filter(Boolean)

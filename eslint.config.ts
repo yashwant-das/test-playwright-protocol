@@ -23,6 +23,9 @@ export default tseslint.config(
       ...playwright.configs['flat/recommended'].rules,
       'playwright/no-raw-locators': 'error',     // forbid page.locator() in specs
       'playwright/prefer-web-first-assertions': 'error',
+      'playwright/no-wait-for-timeout': 'error', // Ban hard waits
+      'playwright/no-focused-test': 'error',    // Ban test.only and describe.only
+      'playwright/no-skipped-test': 'warn',     // Detect test.skip (Warning)
     },
   },
   {

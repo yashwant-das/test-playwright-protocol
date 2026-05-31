@@ -148,6 +148,10 @@ async function processTask(task: Task & { file: string, content: string }) {
             s.stop(theme.success('Test passed'));
 
             log.success(theme.success('Verification passed. Marking task DONE.'));
+            note(
+                `✓ lint passed\n✓ tests passed\n✓ no focused tests\n✓ no hard waits detected`,
+                theme.noteTitle('Verification Summary')
+            );
             updateTaskStatus(filePath, task.content, 'DONE');
             log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to pick up the next task.`);
         }

@@ -457,7 +457,23 @@ unless intentionally documented.
 
 Every test must validate at least one business outcome from the task acceptance criteria.
 
-Passing tests without meaningful validation are considered low quality.
+Assertions should validate outcomes rather than merely element visibility.
+
+**Weak Assertion:**
+
+```typescript
+await expect(button).toBeVisible();
+```
+
+**Strong Business Assertions:**
+
+```typescript
+await expect(total).toHaveText("$54.99");
+await expect(cartCount).toHaveText("3");
+await expect(orderStatus).toContainText("Completed");
+```
+
+Passing tests without meaningful business validation are considered low quality.
 
 ---
 

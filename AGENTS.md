@@ -133,6 +133,7 @@ Use this before every response to confirm compliance:
 - [ ] Selectors verified live via Playwright MCP
 - [ ] No `page.locator()` in any `.spec.ts`
 - [ ] All Page Object properties have `@selector`, `@strategy`, `@verified`
+- [ ] Every test includes strong business assertions (validating outcomes, not just visibility)
 - [ ] `npm run lint` passed
 - [ ] `npm run task <TASK_ID>` passed
 - [ ] Response uses the correct mandatory format (§ 4.1 or § 4.2)

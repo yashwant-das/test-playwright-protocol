@@ -304,9 +304,58 @@ Decide whether always running the selector health check is acceptable. If not, o
 
 ---
 
+### 6. Quality Gates Modernization (SPP v2)
+
+**Status:** `IMPLEMENTED`
+**Owner:** Framework
+**Primary files:** `eslint.config.ts`, `scripts/check-selectors.ts`, `docs/PROTOCOL.md`
+
+#### Why It Matters
+
+Prevents common AI-generated automation mistakes like hard waits, focused tests, and weak assertions that lead to flakiness and maintenance overhead.
+
+#### Implemented Behavior
+
+- **Banned Hard Waits**: `await page.waitForTimeout()` is forbidden.
+- **Banned Focused Tests**: `test.only()` and `describe.only()` are forbidden.
+- **Skipped Test Detection**: `test.skip()` results in a lint warning.
+- **Business Assertions Protocol**: Guidance on meaningful validation over technical visibility.
+- **Selector Health Warnings**: Warns when a selector hasn't been verified in >90 days.
+- **Verification Summary**: Improved CLI/MCP output explicitly showing quality gate status.
+
+#### Reference Snippet
+
+```typescript
+// eslint.config.ts
+'playwright/no-wait-for-timeout': 'error',
+'playwright/no-focused-test': 'error',
+'playwright/no-skipped-test': 'warn',
+```
+
+#### Acceptance Criteria
+
+- [x] Hard waits banned via ESLint.
+- [x] Focused tests banned via ESLint.
+- [x] Skipped tests detected as warnings.
+- [x] Business assertion guidance documented.
+- [x] Selector health warnings implemented.
+- [x] Verification summary improved.
+
+#### Verification Command
+
+```bash
+npm run lint
+```
+
+#### Next Action
+
+Consider making skipped tests a configurable failure in the future.
+
+---
+
 ## ⏳ Backlog (Pending)
 
-### 6. Strict Page Object JSDoc Metadata Schema
+### 7. Strict Page Object JSDoc Metadata Schema
 
 **Status:** `PENDING`
 **Owner:** Framework
