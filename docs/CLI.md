@@ -1,4 +1,4 @@
-# Smart Playwright Task CLI
+# Smart Playwright Protocol CLI
 
 `scripts/task.ts` is the local CLI that moves Markdown task files through the framework lifecycle. Use this document when you need exact command behavior, board usage, and configuration.
 
@@ -12,7 +12,7 @@
 | `npm run task` | Open the interactive task menu. |
 | `npm run task create` | Launch the task creation wizard. |
 | `npm run task next` | Activate or resume the next eligible task. |
-| `npm run task T-###` | Activate, verify, or re-verify one task. |
+| `npm run task <TASK_ID>` | Activate, verify, or re-verify one task. |
 
 ## Interactive Menu
 
@@ -76,6 +76,12 @@ The runner executes quality gates for `IN_PROGRESS` and `BLOCKED` tasks.
 
 ```bash
 npm run task <TASK_ID>
+```
+
+Example:
+
+```bash
+npm run task T-011
 ```
 
 This runs `npm run lint` and `npm test <declared-test-file>`.
@@ -170,7 +176,7 @@ Replace `/absolute/path/to/repo/` with the actual path to your cloned repository
 
 ### `Task <ID> not found`
 
-Check that the task file is in `tasks/` and its filename starts with the task ID (e.g., `T-001_...md`).
+Check that the task file is in `tasks/` and its filename starts with the task ID (e.g., `T-011_...md`).
 
 ### `No Test File found`
 
