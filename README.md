@@ -360,6 +360,7 @@ Use AI for implementation, selector mapping, and failure repair, but keep the li
 | Command | Purpose |
 | :--- | :--- |
 | `npm run task` | Open the interactive task menu. |
+| `npm run task create` | Launch the task creation wizard. |
 | `npm run task next` | Activate or resume the next eligible task. |
 | `npm run task T-011` | Verify or re-verify a specific task. |
 | `npm run lint` | Run code and Markdown lint checks. |

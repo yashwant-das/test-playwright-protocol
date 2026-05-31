@@ -23,6 +23,7 @@ The runner enforces the **Smart Playwright Protocol (SPP) v2.0** lifecycle. It d
 | Command | Purpose |
 | :--- | :--- |
 | `npm run task` | Open the interactive task menu. |
+| `npm run task create` | Launch the task creation wizard. |
 | `npm run task next` | Activate or resume the next eligible task. |
 | `npm run task T-011` | Activate, verify, or re-verify one task. |
 
@@ -40,7 +41,8 @@ The terminal opens an interactive menu similar to:
 ┌  Agentic Playwright Task CLI
 │
 ◆  What would you like to do?
-│  ● Activate or resume next task
+│  ● Create a new task
+│  ○ Activate or resume next task
 │  ○ Verify current active task
 │  ○ Show task board
 │  ○ Show blocked tasks
@@ -51,10 +53,11 @@ Available menu actions:
 
 | Action | Behavior |
 | :--- | :--- |
-| `Activate or resume next task` | Selects the current active task first, then the next dependency-ready `TODO` task. |
-| `Verify current active task` | Runs verification for the current active task. |
-| `Show task board` | Prints all task IDs, titles, and statuses. |
-| `Show blocked tasks` | Lists tasks currently marked `BLOCKED`. |
+| `Create a new task` | Launches the interactive wizard to generate a new task file. |
+| `Activate or resume next task` | Selects the current active task first, then the next dependency-ready `TODO` task. Copies the AI handoff prompt to the clipboard. |
+| `Verify current active task` | Runs verification for the current active task. Copies a repair prompt if verification fails. |
+| `Show task board` | Prints task summary, active task, and recent tasks. |
+| `Show blocked tasks` | Lists tasks currently marked `BLOCKED` with reasons. |
 
 ## Required Task File Shape
 
@@ -85,6 +88,40 @@ priority: "High"
 dependsOn: []
 ---
 ```
+
+## Task Creation Wizard
+
+Run `npm run task create` to start the interactive task generator. It prompts for:
+
+- **Task ID**: Must follow `T-###`.
+- **Title**: Descriptive name for the task.
+- **Page Object**: (Optional) The target Page Object name.
+- **Test File**: (Optional) The target spec file path.
+- **URL**: (Optional) The starting URL.
+- **Acceptance Criteria**: (Optional) Comma-separated list of requirements.
+
+The wizard generates an SPP v2 compliant Markdown file in `tasks/`.
+
+## AI Handoff Prompts
+
+When a task is activated or blocked, the runner generates a concise prompt for the AI assistant and **automatically copies it to your clipboard**.
+
+### Activation Prompt
+
+Generated when a task moves to `IN_PROGRESS`.
+
+- Includes protocol instructions.
+- Includes the task file path.
+
+### Repair Prompt
+
+Generated when verification fails and the task moves to `BLOCKED`.
+
+- Points the agent to `logs/last_run.log`.
+- Instructs the agent to diagnose and fix the smallest possible issue.
+
+> [!TIP]
+> After activating a task or seeing a failure, simply switch to your AI assistant's chat and paste (Ctrl+V/Cmd+V) to provide all necessary context.
 
 ## Task Sections
 
@@ -217,35 +254,7 @@ Use this loop when verification fails:
 
 If the failure is selector-related, prefer Playwright MCP exploration before changing Page Object selectors.
 
-## AI Handoff Prompts
-
-When a task is activated or blocked, the runner prints a concise prompt for the AI assistant. This prompt is designed for you to copy and paste directly into your AI assistant's chat window.
-
-Example blocked prompt:
-
-```text
-Copy and paste this prompt to your AI assistant:
-"Task T-011 is now BLOCKED. Verification failed.
-
-First, read AGENTS.md — it defines the full lifecycle protocol you must follow.
-Then check logs/last_run.log to diagnose the failure.
-Fix the issue and retry: npm run task T-011"
-```
-
-The prompt contains the exact context (task ID and current state) the AI needs. Pair it with:
-
-- the task file in `tasks/`,
-- [../AGENTS.md](../AGENTS.md) (the AI will read the MCP pre-flight check before proceeding),
-- `logs/last_run.log` when blocked.
-
-> [!NOTE]
-> This manual copy-pasting applies to the CLI runner. The MCP tools communicate directly with the AI and provide context without requiring human intervention.
-
 ## MCP Relationship
-
-The repository includes two MCP servers, each serving a distinct purpose.
-
-### Official Playwright MCP
 
 The official [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) server lets AI agents inspect live browser pages, explore DOM structure, and verify selectors. It is the recommended tool for selector discovery before writing or updating Page Objects.
 

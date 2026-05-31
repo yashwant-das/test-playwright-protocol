@@ -16,9 +16,9 @@ node_modules/
 /out/
 
 # --- Agent-generated ---
-/pages/
-/tests/
-/tasks/
+# /pages/
+# /tests/
+# /tasks/
 
 # --- Testing & Playwright ---
 /blob-report/

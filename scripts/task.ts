@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import fm from 'front-matter';
-import { intro, outro, select, log, spinner as clackSpinner, note } from '@clack/prompts';
+import { intro, outro, select, log, spinner as clackSpinner, note, group, text, cancel } from '@clack/prompts';
 import { Task } from '../types/task';
 import { exec } from 'child_process';
 import pc from 'picocolors';
+import clipboard from 'clipboardy';
 
 const theme = {
     status: (s: string) => {
@@ -92,6 +93,15 @@ function updateTaskStatus(filePath: string, fullContent: string, newStatus: stri
     fs.writeFileSync(filePath, newContent);
 }
 
+function copyToClipboard(text: string) {
+    try {
+        clipboard.writeSync(text);
+        return true;
+    } catch (err) {
+        return false;
+    }
+}
+
 async function processTask(task: Task & { file: string, content: string }) {
     const filePath = path.join(TASKS_DIR, task.file);
     const actualTaskId = task.id;
@@ -106,10 +116,14 @@ async function processTask(task: Task & { file: string, content: string }) {
             log.step(`Status: ${theme.status('TODO')}. Moving task to ${theme.status('IN_PROGRESS')}.`);
             updateTaskStatus(filePath, task.content, 'IN_PROGRESS');
             
+            const prompt = `Read docs/PROTOCOL.md\n\nTask: ${actualTaskId} ${task.title}\n\nFollow the Smart Playwright Protocol:\n1. Understand\n2. Explore\n3. Plan\n4. Implement\n\nDo not begin implementation until Understanding is completed.\n\nTask file: tasks/${task.file}`;
+            const copied = copyToClipboard(prompt);
+
             note(
-                `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now IN_PROGRESS. Please read AGENTS.md and tasks/${task.file}, then implement the requirements."`,
+                `Copy and paste this prompt to your AI assistant:${copied ? '\n(Already copied to clipboard ✓)' : ''}\n\n"${prompt}"`,
                 theme.noteTitle('AI handoff')
             );
+            log.info(`${pc.blue('Next:')} Paste the prompt into your AI assistant.`);
         }
         else if (task.status === 'IN_PROGRESS' || task.status === 'BLOCKED') {
             log.step(`Status: ${theme.status(task.status)}. Running verification.`);
@@ -135,6 +149,7 @@ async function processTask(task: Task & { file: string, content: string }) {
 
             log.success(theme.success('Verification passed. Marking task DONE.'));
             updateTaskStatus(filePath, task.content, 'DONE');
+            log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to pick up the next task.`);
         }
         else if (task.status === 'DONE') {
             log.step(`Status: ${theme.status('DONE')}. Re-running verification.`);
@@ -160,10 +175,144 @@ async function processTask(task: Task & { file: string, content: string }) {
         }
         log.error(theme.error('Verification failed.'));
         updateTaskStatus(filePath, task.content, 'BLOCKED');
+        
+        const repairPrompt = `Task ${actualTaskId} is BLOCKED. Verification failed.\n\nRead docs/PROTOCOL.md.\n\nReview:\nlogs/last_run.log\n\nDiagnose the root cause.\nApply the smallest possible fix.\nRe-run: npm run task ${actualTaskId}`;
+        const copied = copyToClipboard(repairPrompt);
+
         note(
-            `Copy and paste this prompt to your AI assistant:\n"Task ${actualTaskId} is now BLOCKED. Verification failed.\n\nFirst, read AGENTS.md — it defines the full lifecycle protocol you must follow.\nThen check logs/last_run.log to diagnose the failure.\nFix the issue and retry: npm run task ${actualTaskId}"`,
+            `Copy and paste this prompt to your AI assistant:${copied ? '\n(Already copied to clipboard ✓)' : ''}\n\n"${repairPrompt}"`,
             theme.noteTitle('Repair required')
         );
+        log.info(`${pc.blue('Next:')} Paste the repair prompt into your AI assistant.`);
+    }
+}
+
+async function createTask() {
+    const task = await group(
+        {
+            id: () => text({
+                message: 'Task ID (e.g., T-012)',
+                placeholder: 'T-###',
+                validate: (value) => {
+                    if (!value || !value.match(/^T-\d{3}$/)) return 'Invalid ID format. Use T-###';
+                }
+            }),
+            title: () => text({
+                message: 'Task Title',
+                placeholder: 'Verify Checkout Tax Calculation',
+                validate: (value) => {
+                    if (!value) return 'Title is required';
+                }
+            }),
+            pageObject: () => text({
+                message: 'Page Object (optional)',
+                placeholder: 'CheckoutPage'
+            }),
+            testFile: () => text({
+                message: 'Test File (optional)',
+                placeholder: 'tests/checkout.spec.ts'
+            }),
+            url: () => text({
+                message: 'URL (optional)',
+                placeholder: '/checkout-step-one.html'
+            }),
+            acceptanceCriteria: () => text({
+                message: 'Acceptance Criteria (comma separated)',
+                placeholder: 'Verify tax is 10%, Verify total includes tax'
+            })
+        },
+        {
+            onCancel: () => {
+                cancel('Task creation cancelled.');
+                process.exit(0);
+            }
+        }
+    );
+
+    const kebabTitle = task.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const filename = `${task.id}_${kebabTitle}.md`;
+    const filePath = path.join(TASKS_DIR, filename);
+
+    if (fs.existsSync(filePath)) {
+        log.error(`Task file already exists: ${filename}`);
+        process.exit(1);
+    }
+
+    const acList = task.acceptanceCriteria
+        ? task.acceptanceCriteria.split(',').map(s => `- [ ] ${s.trim()}`).join('\n')
+        : '- [ ] ';
+
+    const content = `---
+id: "${task.id}"
+title: "${task.title}"
+status: "TODO"
+dependsOn: []
+---
+
+${task.id}: ${task.title}
+
+## Understanding
+
+Feature:
+Expected Behavior:
+Business Outcome:
+Risk:
+
+## Context
+
+- **Page Object:** ${task.pageObject ? `\`pages/${task.pageObject.endsWith('.ts') ? task.pageObject : task.pageObject + '.ts'}\`` : ''}
+- **Test File:** ${task.testFile ? `\`${task.testFile.endsWith('.spec.ts') ? task.testFile : task.testFile + '.spec.ts'}\`` : ''}
+- **URL:** ${task.url || ''}
+
+## Implementation Plan
+
+1.
+2.
+3.
+
+## Acceptance Criteria
+
+${acList}
+`;
+
+    fs.writeFileSync(filePath, content);
+    log.success(`Created task: ${theme.taskId(task.id)} ${pc.dim(filename)}`);
+    log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to activate this task.`);
+}
+
+function showTaskBoard(tasks: (Task & { file: string, content: string })[]) {
+    const summary = {
+        TODO: tasks.filter(t => t.status === 'TODO').length,
+        IN_PROGRESS: tasks.filter(t => t.status === 'IN_PROGRESS').length,
+        BLOCKED: tasks.filter(t => t.status === 'BLOCKED').length,
+        DONE: tasks.filter(t => t.status === 'DONE').length,
+    };
+    
+    log.info('Task Board Summary');
+    log.message(`${theme.status('TODO')}: ${summary.TODO} | ${theme.status('IN_PROGRESS')}: ${summary.IN_PROGRESS} | ${theme.status('BLOCKED')}: ${summary.BLOCKED} | ${theme.status('DONE')}: ${summary.DONE}`);
+    
+    const active = tasks.find(t => t.status === 'IN_PROGRESS');
+    if (active) {
+        log.info('Current Task');
+        log.message(`  ${theme.taskId(active.id)} ${active.title}`);
+    }
+
+    log.info('Recent Tasks');
+    tasks.slice(0, 10).forEach(t => {
+        log.message(`  ${theme.taskId(t.id)} ${t.title} (${theme.status(t.status)})`);
+    });
+}
+
+function showBlockedTasks(tasks: (Task & { file: string, content: string })[]) {
+    const blocked = tasks.filter(t => t.status === 'BLOCKED');
+    if (blocked.length === 0) log.success('No blocked tasks.');
+    else {
+        log.info('Blocked Tasks');
+        blocked.forEach(t => {
+            const reason = t.blockReason ? ` | Reason: ${theme.status(t.blockReason)}` : '';
+            log.error(`  ${theme.taskId(t.id)} ${t.title}${reason}`);
+        });
+        log.info(`${pc.blue('Next:')} Read logs/last_run.log to diagnose failures.`);
     }
 }
 
@@ -172,13 +321,22 @@ async function main() {
     const tasks = getAllTasks();
 
     if (argTask) {
-        if (argTask === 'next') {
+        if (argTask === 'create') {
+            await createTask();
+            process.exit(0);
+        } else if (argTask === 'next') {
             const next = getNextTask(tasks);
             if (!next) {
                 log.info('No eligible tasks found. Resolve blocked work or add a TODO task.');
                 process.exit(0);
             }
             await processTask(next);
+            process.exit(0);
+        } else if (argTask === 'status') {
+            showTaskBoard(tasks);
+            process.exit(0);
+        } else if (argTask === 'blocked') {
+            showBlockedTasks(tasks);
             process.exit(0);
         } else {
             const target = tasks.find(t => 
@@ -208,6 +366,7 @@ async function main() {
     const command = await select({
         message: 'What would you like to do?',
         options: [
+            { value: 'create',   label: 'Create a new task' },
             { value: 'next',     label: 'Activate or resume next task' },
             { value: 'verify',   label: 'Verify current active task' },
             { value: 'status',   label: 'Show task board' },
@@ -215,7 +374,9 @@ async function main() {
         ]
     });
 
-    if (command === 'next') {
+    if (command === 'create') {
+        await createTask();
+    } else if (command === 'next') {
         const next = getNextTask(tasks);
         if (!next) {
             log.info('No eligible tasks found. Resolve blocked work or add a TODO task.');
@@ -230,19 +391,9 @@ async function main() {
             await processTask(active);
         }
     } else if (command === 'status') {
-        log.info('Task board');
-        tasks.forEach(t => {
-            log.message(`  ${theme.taskId(t.id)} ${t.title} (${theme.status(t.status)})`);
-        });
+        showTaskBoard(tasks);
     } else if (command === 'blocked') {
-        const blocked = tasks.filter(t => t.status === 'BLOCKED');
-        if (blocked.length === 0) log.success('No blocked tasks.');
-        else {
-            blocked.forEach(t => {
-                const reason = t.blockReason ? ` (Reason: ${t.blockReason})` : '';
-                log.error(`[${t.id}] ${t.title}${reason} - Check logs/last_run.log`);
-            });
-        }
+        showBlockedTasks(tasks);
     }
 
     outro('Complete.');
