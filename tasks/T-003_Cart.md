@@ -2,8 +2,6 @@
 id: "T-003"
 title: "Verify Cart Functionality"
 status: "TODO"
-owner: "AI"
-priority: "High"
 dependsOn: ["T-002"]
 ---
 

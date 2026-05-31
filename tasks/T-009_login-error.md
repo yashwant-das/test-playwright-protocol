@@ -2,8 +2,6 @@
 id: "T-009"
 title: "Verify Locked Out User"
 status: "TODO"
-owner: "AI"
-priority: "Easy"
 ---
 
 T-009: Verify Locked Out User

@@ -2,8 +2,6 @@
 id: "T-004"
 title: "Verify Logout Flow"
 status: "TODO"
-owner: "AI"
-priority: "Low"
 ---
 
 T-004: Verify Logout Flow

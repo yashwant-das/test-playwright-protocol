@@ -12,8 +12,8 @@ import { Task } from '../types/task';
 // ---------------------------------------------------------------------------
 
 const server = new McpServer({
-    name: 'task-framework',
-    version: '1.0.0',
+    name: 'task-framework (Optional/Experimental)',
+    version: '2.0.0',
 });
 
 const TASKS_DIR = path.resolve(__dirname, '../tasks');

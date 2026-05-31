@@ -1,4 +1,4 @@
-# Agentic Playwright Task CLI
+# Smart Playwright Task CLI
 
 `scripts/task.ts` is the local CLI that moves Markdown task files through the framework lifecycle. Use this document when you need exact command behavior, board usage, and configuration.
 
@@ -92,7 +92,10 @@ The log includes stdout, stderr, lint failures, and Playwright failures. **Alway
 
 ## Configure MCP Servers
 
-The framework includes two MCP servers that MUST be configured in your AI assistant's environment (e.g., Cursor, Claude Desktop, Antigravity IDE).
+The framework supports two MCP servers that can be configured in your AI assistant's environment (e.g., Cursor, Claude Desktop, Antigravity IDE).
+
+- **Official Playwright MCP**: (Recommended) For browser exploration.
+- **Task Framework MCP**: (Optional/Experimental) For lifecycle management.
 
 ### Automated Setup Prompt
 

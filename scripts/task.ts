@@ -366,7 +366,7 @@ async function main() {
         }
     }
 
-    intro(pc.bold('Agentic Playwright Task CLI'));
+    intro(pc.bold('Smart Playwright Task CLI'));
     const command = await select({
         message: 'What would you like to do?',
         options: [

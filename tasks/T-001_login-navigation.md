@@ -2,8 +2,6 @@
 id: "T-001"
 title: "Navigate to Login Page and Verify"
 status: "DONE"
-owner: "AI"
-priority: "High"
 dependsOn: []
 ---
 

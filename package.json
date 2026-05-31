@@ -1,7 +1,7 @@
 {
   "name": "web-playwright-agent-framework",
   "version": "1.0.0",
-  "description": "Agentic SDET Framework: A file-system state machine for Playwright automation with MCP-first exploration, strict JSDoc enforcement, and collaborative human-AI workflows.",
+  "description": "Smart Playwright Protocol (SPP) Framework: A protocol-driven workflow for Playwright automation with file-backed tasks and automated quality gates.",
   "scripts": {
     "test": "playwright test",
     "lint:code": "eslint 'pages/**/*.ts' 'tests/**/*.ts'",

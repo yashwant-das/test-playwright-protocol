@@ -123,15 +123,13 @@ A task is never considered complete without successful verification.
 
 #### 5. Browser Exploration Layer
 
-Playwright MCP is the recommended mechanism for:
+Playwright MCP is the **recommended** mechanism for:
 
 - DOM inspection
 - Selector validation
 - Browser exploration
 
-Playwright MCP is recommended but not mandatory.
-
-The protocol requires validation against reality, not a specific tool.
+The protocol requires validation against reality, not a specific tool. Exploration can be performed manually or via other browser inspection tools.
 
 ---
 
@@ -187,7 +185,7 @@ Examples:
 - Inspect application behavior
 - Review existing Page Objects
 
-Preferred tool:
+Recommended tool:
 
 Playwright MCP
 
@@ -499,12 +497,32 @@ Future enhancements:
 
 ---
 
+## SPP v2 Scope
+
+### Included
+
+- **Smart Playwright Protocol**: The structured workflow (Understand -> Explore -> Plan -> Implement -> Verify -> Recover).
+- **Markdown Tasks**: File-backed units of work with metadata and status.
+- **Task CLI**: Operative tool for task management and verification.
+- **Quality Gates**: Automated enforcement of Playwright best practices.
+- **Playwright Integration**: Native support for Page Objects and spec verification.
+
+### Excluded
+
+- **Multi-Agent Systems**: SPP is designed for single-actor (Human or AI) task execution.
+- **Database Storage**: All state is stored in the filesystem.
+- **Autonomous Loops**: Verification and recovery require explicit actor triggers.
+- **Complex Integrations**: No native Jira, Slack, or CI dashboarding.
+
+---
+
 ## Documentation Structure
 
-The framework maintains five primary documents.
+The framework maintains four primary documents.
 
 ```text
 README.md PROTOCOL.md CLI.md AGENTS.md 
+```
 
 Purpose:
 

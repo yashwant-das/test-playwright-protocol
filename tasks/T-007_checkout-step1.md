@@ -2,8 +2,6 @@
 id: "T-007"
 title: "Verify Checkout Step One"
 status: "TODO"
-owner: "AI"
-priority: "Medium"
 ---
 
 T-007: Verify Checkout Step One

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Agentic Playwright SDET Framework** — a file-backed task lifecycle for Playwright E2E test automation using the **Smart Playwright Protocol (SPP) v2.0**.
+**Smart Playwright Protocol Framework** — a file-backed task lifecycle for Playwright E2E test automation using the **Smart Playwright Protocol (SPP) v2.0**.
 
 ## Key Commands
 
@@ -28,7 +28,7 @@ This framework follows the **Smart Playwright Protocol (SPP) v2.0**:
 - **Page Objects** (`pages/`): Sole owners of selectors and user actions.
 - **Specs** (`tests/`): Test scenarios and business assertions.
 - **ESLint** (`eslint.config.ts`): Enforces quality gates and JSDoc metadata.
-- **MCP server** (`mcp/server.ts`): Task lifecycle tools for agentic IDEs.
+- **MCP server** (`mcp/server.ts`): Task lifecycle tools for AI-assisted IDEs.
 
 ## Critical Coding Rules
 

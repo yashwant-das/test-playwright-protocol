@@ -1,4 +1,4 @@
-# Agentic Playwright SDET Framework
+# Smart Playwright Protocol Framework
 
 [![Playwright](https://img.shields.io/badge/Playwright-1.41.0-2ead34?logo=playwright)](https://playwright.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-3178c6?logo=typescript)](https://www.typescriptlang.org)
@@ -43,9 +43,9 @@ npm install
 npx playwright install
 ```
 
-### 2. Configure MCP Servers (Required for AI)
+### 2. Configure MCP Servers (Recommended)
 
-This framework relies on MCP servers to let AI agents explore the browser and manage tasks.
+This framework supports MCP servers to let AI agents explore the browser and manage tasks. While not mandatory, they significantly improve the AI implementation experience.
 **See [docs/CLI.md](docs/CLI.md#configure-mcp-servers) for setup instructions.**
 
 ### 3. Create Your First Task

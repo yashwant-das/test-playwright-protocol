@@ -3,8 +3,6 @@ id: "T-010"
 title: "Verify External Contact Form"
 status: "BLOCKED"
 blockReason: "verification"
-owner: "AI"
-priority: "High"
 dependsOn: []
 ---
 

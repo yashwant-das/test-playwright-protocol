@@ -2,8 +2,6 @@
 id: "T-002"
 title: "Verify Inventory Page"
 status: "BLOCKED"
-owner: "AI"
-priority: "Medium"
 ---
 
 T-002: Verify Inventory Page

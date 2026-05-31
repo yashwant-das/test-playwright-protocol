@@ -2,8 +2,6 @@
 id: "T-008"
 title: "Verify Checkout Completion"
 status: "TODO"
-owner: "AI"
-priority: "Complex"
 ---
 
 T-008: Verify Checkout Completion

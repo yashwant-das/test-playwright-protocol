@@ -2,8 +2,6 @@
 id: "T-006"
 title: "Verify Product Sorting"
 status: "TODO"
-owner: "AI"
-priority: "Medium"
 ---
 
 T-006: Verify Product Sorting
