@@ -25,10 +25,19 @@ const LOG_FILE = path.join(LOG_DIR, 'last_run.log');
 // All diagnostics MUST go to stderr or a log file.
 // ---------------------------------------------------------------------------
 
+/**
+ * Protocol-safe logging — stdout is reserved for JSON-RPC messages.
+ * All diagnostics MUST go to stderr or a log file.
+ * @param msg The message to log to stderr.
+ */
 function log(msg: string): void {
     console.error(`[spp-protocol] ${msg}`);
 }
 
+/**
+ * Appends a message to the framework's last_run.log file.
+ * @param msg The message to log to the file.
+ */
 function logToFile(msg: string): void {
     if (!fs.existsSync(LOG_DIR)) {
         fs.mkdirSync(LOG_DIR, { recursive: true });
@@ -40,6 +49,11 @@ function logToFile(msg: string): void {
 // Shell Command Runner (with logging)
 // ---------------------------------------------------------------------------
 
+/**
+ * Executes a shell command and logs output to the framework log file.
+ * @param command The shell command to execute.
+ * @returns A promise that resolves with the command's stdout.
+ */
 function runCmd(command: string): Promise<string> {
     logToFile(`\n> ${command}\n`);
     return new Promise((resolve, reject) => {
@@ -69,6 +83,11 @@ function runCmd(command: string): Promise<string> {
 
 const SAFE_TEST_PATH = /^[a-zA-Z0-9_\-./]+\.spec\.ts$/;
 
+/**
+ * Validates a test file path for safety and existence.
+ * @param testFile The relative path to the test file.
+ * @returns Validation result with either absolute path or error reason.
+ */
 function validateTestFilePath(
     testFile: string,
 ): { valid: true; absolute: string } | { valid: false; reason: string } {
@@ -101,6 +120,10 @@ function validateTestFilePath(
 
 type TaskWithMeta = Task & { file: string; content: string };
 
+/**
+ * Reads all task files from the tasks/ directory and parses their front-matter.
+ * @returns An array of tasks with metadata.
+ */
 function getAllTasks(): TaskWithMeta[] {
     const files = fs
         .readdirSync(TASKS_DIR)
@@ -117,13 +140,20 @@ function getAllTasks(): TaskWithMeta[] {
                 file: f,
                 content,
             });
-        } catch (err: any) {
-            log(`Failed to parse front-matter in task file tasks/${f}: ${err.message || err}`);
+        } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : String(err);
+            log(`Failed to parse front-matter in task file tasks/${f}: ${msg}`);
         }
     }
     return tasks;
 }
 
+/**
+ * Updates the status field in a task file's front-matter.
+ * @param filePath Path to the task file.
+ * @param fullContent Full content of the task file.
+ * @param newStatus The new status value.
+ */
 function updateTaskStatus(
     filePath: string,
     fullContent: string,
@@ -139,6 +169,11 @@ function updateTaskStatus(
     fs.writeFileSync(filePath, updated);
 }
 
+/**
+ * Finds a specific task by its ID.
+ * @param taskId The task ID (e.g., T-001).
+ * @returns The task object or an error message.
+ */
 function findTask(
     taskId: string,
 ): TaskWithMeta | { error: string } {
@@ -148,10 +183,20 @@ function findTask(
     return target;
 }
 
+/**
+ * Formats an error response for MCP.
+ * @param text Error message.
+ * @returns MCP error response object.
+ */
 function errorResponse(text: string) {
     return { content: [{ type: 'text' as const, text }], isError: true };
 }
 
+/**
+ * Formats a text response for MCP.
+ * @param text The message text.
+ * @returns MCP text response object.
+ */
 function textResponse(text: string) {
     return { content: [{ type: 'text' as const, text }] };
 }
@@ -160,40 +205,45 @@ function textResponse(text: string) {
 // Tool: create_task
 // ---------------------------------------------------------------------------
 
-server.tool(
+/**
+ * Tool to generate a new SPP v2.0 compliant task file in the tasks/ directory.
+ */
+server.registerTool(
     'create_task',
-    'Generate a new SPP v2.0 compliant task file in the tasks/ directory. This tool ensures consistent task structure and metadata.',
     {
-        taskId: z
-            .string()
-            .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-012)')
-            .describe('The unique task ID, e.g. T-012'),
-        title: z
-            .string()
-            .min(1)
-            .describe('Descriptive title for the task'),
-        pageObject: z
-            .string()
-            .optional()
-            .describe('The name of the target Page Object (e.g. CheckoutPage)'),
-        testFile: z
-            .string()
-            .optional()
-            .describe('The target spec file path (e.g. tests/checkout.spec.ts)'),
-        url: z
-            .string()
-            .optional()
-            .describe('The entry point URL for the test'),
-        acceptanceCriteria: z
-            .string()
-            .optional()
-            .describe('Comma-separated list of requirements'),
-        dependsOn: z
-            .array(z.string())
-            .optional()
-            .describe('Optional list of task IDs that must be DONE first'),
+        description: 'Generate a new SPP v2.0 compliant task file in the tasks/ directory. This tool ensures consistent task structure and metadata.',
+        inputSchema: {
+            taskId: z
+                .string()
+                .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-012)')
+                .describe('The unique task ID, e.g. T-012'),
+            title: z
+                .string()
+                .min(1)
+                .describe('Descriptive title for the task'),
+            pageObject: z
+                .string()
+                .optional()
+                .describe('The name of the target Page Object (e.g. CheckoutPage)'),
+            testFile: z
+                .string()
+                .optional()
+                .describe('The target spec file path (e.g. tests/checkout.spec.ts)'),
+            url: z
+                .string()
+                .optional()
+                .describe('The entry point URL for the test'),
+            acceptanceCriteria: z
+                .string()
+                .optional()
+                .describe('Comma-separated list of requirements'),
+            dependsOn: z
+                .array(z.string())
+                .optional()
+                .describe('Optional list of task IDs that must be DONE first'),
+        },
     },
-    async ({ taskId, title, pageObject, testFile, url, acceptanceCriteria, dependsOn }) => {
+    ({ taskId, title, pageObject, testFile, url, acceptanceCriteria, dependsOn }) => {
         log(`create_task called for ${taskId}`);
 
         const kebabTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -250,16 +300,21 @@ ${acList}
 // Tool: activate_task
 // ---------------------------------------------------------------------------
 
-server.tool(
+/**
+ * Phase 1 (Select): Transition a task from TODO to IN_PROGRESS.
+ */
+server.registerTool(
     'activate_task',
-    'Phase 1 (Select): Transition a task from TODO to IN_PROGRESS. Checks dependencies before allowing activation.',
     {
-        taskId: z
-            .string()
-            .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-001)')
-            .describe('The task ID to activate, e.g. T-001'),
+        description: 'Phase 1 (Select): Transition a task from TODO to IN_PROGRESS. Checks dependencies before allowing activation.',
+        inputSchema: {
+            taskId: z
+                .string()
+                .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-001)')
+                .describe('The task ID to activate, e.g. T-001'),
+        },
     },
-    async ({ taskId }) => {
+    ({ taskId }) => {
         log(`activate_task called for ${taskId}`);
 
         const result = findTask(taskId);
@@ -310,25 +365,30 @@ server.tool(
                 'Begin Phase 2 (Understand) by editing the task file.'
             ].join('\n')
         );
-    },
+    }
 );
 
 // ---------------------------------------------------------------------------
 // Tool: verify_task
 // ---------------------------------------------------------------------------
 
-server.tool(
+/**
+ * Run automated quality gates (ESLint linting and Playwright tests) for a task.
+ */
+server.registerTool(
     'verify_task',
-    'Run automated quality gates (ESLint linting and Playwright tests) for a task. If both gates pass, the task transitions to DONE. If either gate fails, the task transitions to BLOCKED and the failure details are written to logs/last_run.log.',
     {
-        taskId: z
-            .string()
-            .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-001)')
-            .describe('The task ID to verify, e.g. T-001'),
-        notes: z
-            .string()
-            .optional()
-            .describe('Optional completion notes to attach to the result'),
+        description: 'Run automated quality gates (ESLint linting and Playwright tests) for a task. If both gates pass, the task transitions to DONE. If either gate fails, the task transitions to BLOCKED and the failure details are written to logs/last_run.log.',
+        inputSchema: {
+            taskId: z
+                .string()
+                .regex(/^T-\d{3}$/, 'Must be in the format T-### (e.g. T-001)')
+                .describe('The task ID to verify, e.g. T-001'),
+            notes: z
+                .string()
+                .optional()
+                .describe('Optional completion notes to attach to the result'),
+        },
     },
     async ({ taskId, notes }) => {
         log(`verify_task called for ${taskId}`);
@@ -354,7 +414,7 @@ server.tool(
 
             // ── Gate 2: Playwright Tests ──────────────────────────────
             const testFileMatch = freshContent.match(
-                /- \*\*Test File:\*\* `(.*)`/,
+                /- \*\*Test File:\*\* \`(.*)\`/,
             );
             if (!testFileMatch) {
                 throw new Error(
@@ -415,25 +475,30 @@ server.tool(
                 ].join('\n')
             );
         }
-    },
+    }
 );
 
 // ---------------------------------------------------------------------------
 // Tool: list_tasks
 // ---------------------------------------------------------------------------
 
-server.tool(
+/**
+ * Tool to list all tasks with status and summary.
+ */
+server.registerTool(
     'list_tasks',
-    'List all tasks with their current status, title, and dependency information. Use this to get a full overview of the project task board.',
     {
-        status: z
-            .enum(['TODO', 'IN_PROGRESS', 'DONE', 'BLOCKED'])
-            .optional()
-            .describe(
-                'Optional filter: only return tasks matching this status',
-            ),
+        description: 'List all tasks with their current status, title, and dependency information. Use this to get a full overview of the project task board.',
+        inputSchema: {
+            status: z
+                .enum(['TODO', 'IN_PROGRESS', 'DONE', 'BLOCKED'])
+                .optional()
+                .describe(
+                    'Optional filter: only return tasks matching this status',
+                ),
+        },
     },
-    async ({ status }) => {
+    ({ status }) => {
         log(`list_tasks called${status ? ` (filter: ${status})` : ''}`);
 
         const allTasks = getAllTasks();
@@ -481,18 +546,23 @@ server.tool(
                 ...lines
             ].join('\n')
         );
-    },
+    }
 );
 
 // ---------------------------------------------------------------------------
 // Tool: get_unmet_dependencies
 // ---------------------------------------------------------------------------
 
-server.tool(
+/**
+ * Tool to list tasks with unmet dependencies.
+ */
+server.registerTool(
     'get_unmet_dependencies',
-    'List tasks that cannot be activated because they are waiting on unmet dependencies. A task is in this list when one or more tasks in its dependsOn list are not yet DONE.',
-    {},
-    async () => {
+    {
+        description: 'List tasks that cannot be activated because they are waiting on unmet dependencies. A task is in this list when one or more tasks in its dependsOn list are not yet DONE.',
+        inputSchema: {},
+    },
+    () => {
         log('get_unmet_dependencies called');
 
         const tasks = getAllTasks();
@@ -519,20 +589,23 @@ server.tool(
             .join('\n');
 
         return textResponse(text);
-    },
+    }
 );
 
 // ---------------------------------------------------------------------------
 // Startup
 // ---------------------------------------------------------------------------
 
+/**
+ * Initializes the MCP server and connects it to the stdio transport.
+ */
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
     log('Smart Playwright Protocol MCP server connected and ready.');
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
     // Protocol-safe: only stderr, never stdout
     console.error('Fatal: MCP server failed to start:', err);
     process.exit(1);
