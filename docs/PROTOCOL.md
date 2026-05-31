@@ -1,9 +1,10 @@
 # Smart Playwright Protocol (SPP) v2.0
+
 ## Architecture & Design Principles
 
 ---
 
-# Vision
+## Vision
 
 Smart Playwright Protocol (SPP) is a lightweight, protocol-driven workflow for AI-assisted Playwright automation.
 
@@ -23,7 +24,7 @@ SPP intentionally avoids complex orchestration, multi-agent systems, autonomous 
 
 ---
 
-# Core Philosophy
+## Core Philosophy
 
 The protocol is the product.
 
@@ -31,17 +32,19 @@ Everything else exists to support the protocol.
 
 The framework is built around a single workflow:
 
-text Understand     ↓ Explore     ↓ Plan     ↓ Implement     ↓ Verify     ↓ Recover 
+```text
+Understand     ↓ Explore     ↓ Plan     ↓ Implement     ↓ Verify     ↓ Recover 
+```
 
 This mirrors how experienced SDETs approach automation work.
 
 ---
 
-# Architecture
+## Architecture
 
-## Core Components
+### Core Components
 
-### 1. Protocol
+#### 1. Protocol
 
 The protocol defines how work is performed.
 
@@ -56,11 +59,13 @@ The protocol remains stable over time.
 
 ---
 
-### 2. Task Files
+#### 2. Task Files
 
 Task files are Markdown documents stored in:
 
-text tasks/ 
+```text
+tasks/ 
+```
 
 Task files are the source of truth for work.
 
@@ -82,7 +87,7 @@ Benefits:
 
 ---
 
-### 3. CLI
+#### 3. CLI
 
 The CLI is the operational interface.
 
@@ -99,7 +104,7 @@ The CLI owns workflow execution.
 
 ---
 
-### 4. Verification Layer
+#### 4. Verification Layer
 
 Verification determines task completion.
 
@@ -116,7 +121,7 @@ A task is never considered complete without successful verification.
 
 ---
 
-### 5. Browser Exploration Layer
+#### 5. Browser Exploration Layer
 
 Playwright MCP is the recommended mechanism for:
 
@@ -130,13 +135,15 @@ The protocol requires validation against reality, not a specific tool.
 
 ---
 
-# Workflow
+## Workflow
 
-## Phase 1 — Select
+### Phase 1 — Select
 
 Choose the next eligible task.
 
-text TODO → IN_PROGRESS 
+```text
+TODO → IN_PROGRESS 
+```
 
 Requirements:
 
@@ -145,7 +152,7 @@ Requirements:
 
 ---
 
-## Phase 2 — Understand
+### Phase 2 — Understand
 
 Before implementation begins:
 
@@ -158,13 +165,18 @@ Understand:
 
 Required output:
 
-markdown Feature: Expected Behavior: Business Outcome: Risk: 
+```markdown
+Feature:
+Expected Behavior:
+Business Outcome:
+Risk:
+```
 
 Implementation should never begin before understanding exists.
 
 ---
 
-## Phase 3 — Explore
+### Phase 3 — Explore
 
 Validate assumptions.
 
@@ -185,13 +197,19 @@ Understand the application before modifying code.
 
 ---
 
-## Phase 4 — Plan
+### Phase 4 — Plan
 
 Create a lightweight implementation plan.
 
 Example:
 
-markdown Implementation Plan  1. Create CheckoutPage 2. Add tax selectors 3. Add assertions 4. Verify acceptance criteria 
+```markdown
+Implementation Plan
+1. Create CheckoutPage
+2. Add tax selectors
+3. Add assertions
+4. Verify acceptance criteria
+```
 
 The plan should remain concise.
 
@@ -199,7 +217,7 @@ The purpose is clarity, not documentation.
 
 ---
 
-## Phase 5 — Implement
+### Phase 5 — Implement
 
 Create or modify:
 
@@ -215,11 +233,11 @@ Requirements:
 
 ---
 
-## Phase 6 — Design Tests
+### Phase 6 — Design Tests
 
 Tests follow AAA.
 
-### Arrange
+#### Arrange
 
 Prepare:
 
@@ -227,11 +245,11 @@ Prepare:
 - Navigation
 - State
 
-### Act
+#### Act
 
 Perform the user action.
 
-### Assert
+#### Assert
 
 Validate business behavior.
 
@@ -239,13 +257,16 @@ Assertions should validate outcomes rather than merely element visibility.
 
 ---
 
-## Phase 7 — Verify
+### Phase 7 — Verify
 
 Execute verification.
 
 Minimum requirements:
 
-bash npm run lint npm run task <TASK_ID> 
+```bash
+npm run lint
+npm run task <TASK_ID> 
+```
 
 Verification validates:
 
@@ -255,15 +276,19 @@ Verification validates:
 
 Outcome:
 
-text IN_PROGRESS → DONE 
+```text
+IN_PROGRESS → DONE 
+```
 
 or
 
-text IN_PROGRESS → BLOCKED 
+```text
+IN_PROGRESS → BLOCKED 
+```
 
 ---
 
-## Phase 8 — Recover
+### Phase 8 — Recover
 
 When verification fails:
 
@@ -278,23 +303,23 @@ Evidence always precedes fixes.
 
 ---
 
-# Task States
+## Task States
 
 Only four task states exist.
 
-## TODO
+### TODO
 
 Task has not started.
 
 ---
 
-## IN_PROGRESS
+### IN_PROGRESS
 
 Task is actively being implemented.
 
 ---
 
-## BLOCKED
+### BLOCKED
 
 Task cannot continue or verification failed.
 
@@ -302,15 +327,20 @@ A block reason should be recorded.
 
 Supported reasons:
 
-text dependency requirement selector verification environment 
+```text
+dependency requirement selector verification environment 
+```
 
 Example:
 
-yaml status: BLOCKED blockReason: verification 
+```yaml
+status: BLOCKED
+blockReason: verification 
+```
 
 ---
 
-## DONE
+### DONE
 
 Verification completed successfully.
 
@@ -318,69 +348,112 @@ All acceptance criteria satisfied.
 
 ---
 
-# Task Structure
+## Task Structure
 
 Standard task format:
 
-markdown --- id: T-011 title: Verify Checkout Tax status: TODO dependsOn: [] ---  # Understanding  Feature:  Expected Behavior:  Business Outcome:  Risk:  # Context  - Page Object: - Test File: - URL:  # Implementation Plan  1. 2. 3.  # Acceptance Criteria  - [ ] - [ ] 
+```markdown
+---
+id: T-011
+title: Verify Checkout Tax
+status: TODO
+blockReason: verification
+dependsOn: []
+---
+
+# Understanding
+
+Feature:
+Expected Behavior:
+Business Outcome:
+Risk:
+
+# Context
+
+- **Page Object:**
+- **Test File:**
+- **URL:**
+
+# Implementation Plan
+
+1.
+2.
+3.
+
+# Acceptance Criteria
+
+- [ ]
+- [ ]
+```
 
 ---
 
-# Quality Gates
+## Quality Gates
 
-## Pre-Commit
+### Pre-Commit
 
 Required:
 
-bash npm run lint 
+```bash
+npm run lint
+```
 
 ---
 
-## Verification Gates
+### Verification Gates
 
 Required:
 
-bash npm run lint npm run task <TASK_ID> 
+```bash
+npm run lint
+npm run task <TASK_ID> 
+```
 
 ---
 
-## Required Rules
+### Required Rules
 
-### No Raw Locators in Specs
+#### No Raw Locators in Specs
 
 Selectors belong in Page Objects.
 
 ---
 
-### No Hard Waits
+#### No Hard Waits
 
 Disallow:
 
-typescript page.waitForTimeout(...) 
+```typescript
+page.waitForTimeout(...) 
+```
 
 Use proper synchronization mechanisms.
 
 ---
 
-### No Accidental Test Isolation
+#### No Accidental Test Isolation
 
 Disallow:
 
-typescript test.only(...) describe.only(...) 
+```typescript
+test.only(...) describe.only(...) 
+```
 
 ---
 
-### No Committed Skipped Tests
+#### No Committed Skipped Tests
 
 Disallow:
 
-typescript test.skip(...) 
+```typescript
+test.skip(...) 
+```
 
 unless intentionally documented.
 
 ---
 
-### Business Assertions Required
+#### Business Assertions Required
 
 Every test must validate at least one business outcome from the task acceptance criteria.
 
@@ -388,13 +461,19 @@ Passing tests without meaningful validation are considered low quality.
 
 ---
 
-# CLI Responsibilities
+## CLI Responsibilities
 
 The CLI owns execution.
 
 Supported operations:
 
-text Create Task Activate Task Verify Task Show Board Show Blocked Tasks 
+```text
+Create Task
+Activate Task
+Verify Task
+Show Board
+Show Blocked Tasks 
+```
 
 Future enhancements:
 
@@ -404,33 +483,48 @@ Future enhancements:
 
 ---
 
-# Documentation Structure
+## Documentation Structure
 
-The framework should maintain only four primary documents.
+The framework maintains five primary documents.
 
-text README.md PROTOCOL.md CLI.md ROADMAP.md 
+```text
+README.md PROTOCOL.md TASK_CLI.md ROADMAP.md AGENTS.md 
+```
 
 Purpose:
 
 README.md
+
 - onboarding
 - quick start
 
 PROTOCOL.md
+
+- architectural source of truth
 - workflow
 - states
 - rules
 
-CLI.md
+TASK_CLI.md
+
 - commands
 - troubleshooting
+- internals
 
 ROADMAP.md
+
 - future enhancements
+- implementation status
+
+AGENTS.md
+
+- agent instructions
+- completion protocol
+- MCP check
 
 ---
 
-# Non-Goals
+## Non-Goals
 
 SPP intentionally excludes:
 
@@ -448,7 +542,7 @@ The protocol favors simplicity over automation complexity.
 
 ---
 
-# Success Criteria
+## Success Criteria
 
 A task may move to DONE only when:
 

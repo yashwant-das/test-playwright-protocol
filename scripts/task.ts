@@ -85,7 +85,7 @@ function getNextTask(tasks: (Task & { file: string, content: string })[]) {
 }
 
 function updateTaskStatus(filePath: string, fullContent: string, newStatus: string) {
-    let newContent = fullContent.replace(/status: ".*"/, `status: "${newStatus}"`);
+    let newContent = fullContent.replace(/status: ["']?.*["']?/, `status: "${newStatus}"`);
     if (newStatus === 'DONE') {
         newContent = newContent.replace(/- \[ \]/g, '- [x]');
     }
@@ -239,7 +239,8 @@ async function main() {
         if (blocked.length === 0) log.success('No blocked tasks.');
         else {
             blocked.forEach(t => {
-                log.error(`[${t.id}] ${t.title} - Check logs/last_run.log`);
+                const reason = t.blockReason ? ` (Reason: ${t.blockReason})` : '';
+                log.error(`[${t.id}] ${t.title}${reason} - Check logs/last_run.log`);
             });
         }
     }

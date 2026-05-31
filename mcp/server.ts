@@ -130,7 +130,7 @@ function updateTaskStatus(
     newStatus: string,
 ): void {
     let updated = fullContent.replace(
-        /status: ".*"/,
+        /status: ["']?.*["']?/,
         `status: "${newStatus}"`,
     );
     if (newStatus === 'DONE') {
@@ -355,7 +355,8 @@ server.tool(
                     : unmetDeps.length > 0
                       ? ` | Blocked by: ${unmetDeps.join(', ')}`
                       : ` | Dependencies met`;
-            return `[${t.id}] ${t.title} (${t.status})${depInfo}`;
+            const reason = t.blockReason ? ` | Reason: ${t.blockReason}` : '';
+            return `[${t.id}] ${t.title} (${t.status})${reason}${depInfo}`;
         });
 
         return textResponse(lines.join('\n'));

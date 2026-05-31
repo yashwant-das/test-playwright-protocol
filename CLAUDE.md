@@ -60,6 +60,7 @@ TODO ──► IN_PROGRESS ──► DONE
 ## Adding a New Task
 
 Copy `tasks/template.md` to `tasks/T-###_description.md`, set `status: "TODO"`, and include:
+
 - YAML frontmatter with `id`, `title`, `status`, optional `dependsOn`
 - `Context` block with `Page Object`, `Test File`, and `Url` lines
 - Acceptance criteria checklist

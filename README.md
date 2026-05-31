@@ -5,7 +5,7 @@
 [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4b32c3?logo=eslint)](https://eslint.org)
 [![Node](https://img.shields.io/badge/Node-18+-339933?logo=nodedotjs)](https://nodejs.org)
 
-**Protocol:** Smart Playwright Protocol v1.0
+**Protocol:** Smart Playwright Protocol v2.0
 **Architecture:** File-backed task lifecycle for Playwright automation
 **Objective:** Keep human-AI test automation work explicit, reviewable, and repeatable.
 
@@ -14,17 +14,18 @@ The Smart Playwright Protocol is the operating model behind the framework. It tu
 It is not a fully autonomous test-generation platform. It is a disciplined framework for managing AI-assisted Playwright implementation with task state, Page Object conventions, selector documentation, logs, and verification gates.
 
 > [!NOTE]
-> Start with this README for setup and daily workflow. Use [docs/TASK_CLI.md](docs/TASK_CLI.md) for detailed command behavior, lifecycle rules, dependency handling, and troubleshooting.
+> Start with this README for setup and daily workflow. Use [docs/PROTOCOL.md](docs/PROTOCOL.md) for the architectural source of truth and [docs/TASK_CLI.md](docs/TASK_CLI.md) for detailed command behavior and lifecycle rules.
 
-## Documentation Map
+## Documentation
 
 | File | Use It For |
 | :--- | :--- |
-| [README.md](README.md) | First-time setup, daily workflow, framework rules, and common recovery steps. |
-| [docs/TASK_CLI.md](docs/TASK_CLI.md) | Detailed task CLI reference, command behavior, lifecycle transitions, logs, and MCP relationship. |
-| [AGENTS.md](AGENTS.md) | Mandatory instructions for AI agents implementing tasks. |
-| [tasks/template.md](tasks/template.md) | Starting point for new task files. |
+| [README.md](README.md) | First-time setup, daily workflow, and framework rules. |
+| [docs/PROTOCOL.md](docs/PROTOCOL.md) | **Architectural source of truth**: workflow, states, and rules. |
+| [docs/TASK_CLI.md](docs/TASK_CLI.md) | Detailed task CLI reference, command behavior, and troubleshooting. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Shipped improvements, known gaps, and planned enhancements. |
+| [AGENTS.md](AGENTS.md) | Lightweight agent-specific instructions. |
+| [tasks/template.md](tasks/template.md) | Starting point for new task files. |
 
 ## What This Framework Provides
 

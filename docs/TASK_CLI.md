@@ -3,7 +3,7 @@
 `scripts/task.ts` is the local CLI that moves Markdown task files through the framework lifecycle. Use this document when you need exact command behavior, status transitions, dependency rules, verification details, and failure recovery guidance.
 
 > [!NOTE]
-> For first-time setup, MCP server configuration, and the end-to-end user workflow, start with [README.md](../README.md). This file is the deeper task runner reference.
+> For first-time setup, MCP server configuration, and the end-to-end user workflow, start with [README.md](../README.md). For the architectural source of truth, see [PROTOCOL.md](PROTOCOL.md). This file is the deeper task runner reference.
 
 ## What the Runner Owns
 
@@ -16,7 +16,7 @@ The runner is responsible for:
 - Writing command output to `logs/last_run.log`.
 - Printing handoff prompts for AI-assisted implementation or repair.
 
-The runner does not write Page Objects, generate tests, inspect web pages, or replace human review. Those responsibilities stay with the human and AI assistant workflow.
+The runner enforces the **Smart Playwright Protocol (SPP) v2.0** lifecycle. It does not write Page Objects, generate tests, inspect web pages, or replace human review. Those responsibilities stay with the human and AI assistant workflow.
 
 ## Commands
 
@@ -79,20 +79,44 @@ Required frontmatter for normal use:
 id: "T-011"
 title: "Verify Checkout Tax"
 status: "TODO"
+blockReason: "verification" # Optional
 owner: "AI"
 priority: "High"
 dependsOn: []
 ---
 ```
 
-For verification, the task body should include a context line for the test file:
+## Task Sections
 
-```markdown
-- **Test File:** `tests/checkout.spec.ts`
-```
+SPP v2 tasks use a structured format to guide implementation:
 
-> [!WARNING]
-> If the `- **Test File:**` line is missing, the runner cannot verify an active task and will mark it `BLOCKED`.
+### Understanding
+
+Captures the reasoning before implementation:
+
+- **Feature**: What is being tested.
+- **Expected Behavior**: The desired outcome.
+- **Business Outcome**: The value of this test.
+- **Risk**: What happens if this fails or is incorrect.
+
+### Context
+
+Technical environment details:
+
+- **Page Object**: The target POM file.
+- **Test File**: The target spec file.
+- **URL**: The entry point for the test.
+
+### Implementation Plan
+
+The intended approach before coding begins. Keeps the agent focused on the strategy.
+
+### Acceptance Criteria
+
+The verification target. Checked off by the runner upon successful verification.
+
+> [!IMPORTANT]
+> The runner looks for the `- **Test File:**` line when verifying a task. Keep that line accurate.
 
 ## Task Selection Order
 
@@ -338,7 +362,8 @@ If the server responds with a JSON-RPC result containing `serverInfo`, it is wor
 | File | Purpose |
 | :--- | :--- |
 | [../README.md](../README.md) | End-user setup, MCP configuration, and workflow guide. |
-| [../AGENTS.md](../AGENTS.md) | AI implementation rules and completion format. |
+| [PROTOCOL.md](PROTOCOL.md) | **Architectural source of truth**: workflow, states, and rules. |
+| [../AGENTS.md](../AGENTS.md) | Lightweight AI agent instructions and completion format. |
 | [../tasks/template.md](../tasks/template.md) | Template for new tasks. |
 | [../scripts/task.ts](../scripts/task.ts) | Task runner implementation. |
 | [../scripts/check-selectors.ts](../scripts/check-selectors.ts) | Page Object selector health check. |

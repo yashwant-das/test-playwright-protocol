@@ -2,27 +2,36 @@
 id: "T-010"
 title: "Verify External Contact Form"
 status: "BLOCKED"
+blockReason: "verification"
 owner: "AI"
 priority: "High"
+dependsOn: []
 ---
 
 T-010: Verify External Contact Form
 
-## Objective
+## Understanding
 
-Navigate to an external "Unknown World" website and verify the contact form functionality.
-Target: `https://automationexercise.com/contact_us`
+Feature: External Contact Form
+Expected Behavior: Users can submit inquiries via an external contact form with attachments.
+Business Outcome: External communication channel remains functional for lead generation.
+Risk: External site changes could break our selectors.
 
 ## Context
 
 - **Page Object:** `pages/ContactPage.ts`
 - **Test File:** `tests/external_contact.spec.ts`
-- **Constraint:** This is an external site. You MUST use `@playwright/mcp` to explore it first as per `AGENTS.md`.
+- **URL:** `https://automationexercise.com/contact_us`
+
+## Implementation Plan
+
+1. Explore external page using Playwright MCP to identify selectors.
+2. Implement `ContactPage` with JSDoc metadata.
+3. Handle file upload dialog and submission.
+4. Verify success message presence.
 
 ## Acceptance Criteria
 
-> (See Standard DoD in AGENTS.md)
-
-- [ ] Use `@playwright/mcp` (or simulate it if unavailable) to map the page.
+- [ ] Use `@playwright/mcp` to map the page.
 - [ ] Upload a file during contact form submission.
 - [ ] Verify success message `Success! Your details have been submitted successfully.`
