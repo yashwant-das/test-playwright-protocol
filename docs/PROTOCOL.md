@@ -522,7 +522,12 @@ The repository enforces a structured commit message format to ensure history rem
 The framework maintains five primary documents.
 
 ```text
-README.md PROTOCOL.md CLI.md ROADMAP.md AGENTS.md 
+README.md
+PROTOCOL.md
+CLI.md
+ROADMAP.md
+AGENTS.md
+ 
 ```
 
 Purpose:

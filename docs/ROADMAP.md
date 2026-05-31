@@ -16,14 +16,14 @@ This document tracks planned architectural changes, toolchain upgrades, and fram
 **Owner:** Framework
 **Why it matters:** Enforce quality gates in a remote pipeline before merging pull requests.
 
-### 3. Priority-Aware Task Selection
-
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** Allow the `npm run task next` command to prioritize tasks based on explicit metadata.
-
-### 4. Configurable Quality Gates
+### 3. Configurable Quality Gates
 
 **Status:** `PENDING`
 **Owner:** Framework
 **Why it matters:** Allow users to promote warnings (like skipped tests) to errors based on project needs.
+
+### 4. Priority-Aware Task Selection
+
+**Status:** `PENDING`
+**Owner:** Framework
+**Why it matters:** Allow the `npm run task next` command to prioritize tasks based on explicit metadata.

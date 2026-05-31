@@ -1,4 +1,4 @@
-# Smart Playwright Protocol Framework
+# Smart Playwright Protocol (SPP)
 
 [![Playwright](https://img.shields.io/badge/Playwright-1.41.0-2ead34?logo=playwright)](https://playwright.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-3178c6?logo=typescript)](https://www.typescriptlang.org)

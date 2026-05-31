@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Smart Playwright Protocol Framework** — a file-backed task lifecycle for Playwright E2E test automation using the **Smart Playwright Protocol (SPP) v2.0**.
+**Smart Playwright Protocol (SPP)** — a file-backed task lifecycle for Playwright E2E test automation using the **Smart Playwright Protocol (SPP) v2.0**.
 
 ## Key Commands
 
