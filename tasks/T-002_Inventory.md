@@ -2,22 +2,31 @@
 id: "T-002"
 title: "Verify Inventory Page"
 status: "BLOCKED"
+dependsOn: ["T-001"]
 ---
 
 T-002: Verify Inventory Page
 
-## Objective
+## Understanding
 
-Verify that the inventory page displays products correctly after login.
+Feature: Inventory Management
+Expected Behavior: Authenticated users can view the product list with accurate details.
+Business Outcome: Users can browse and select products for purchase.
+Risk: Failure to display products prevents core e-commerce functionality.
 
 ## Context
 
 - **Page Object:** `pages/InventoryPage.ts`
 - **Test File:** `tests/inventory.spec.ts`
+- **URL:** `/inventory.html`
+
+## Implementation Plan
+
+1. Create `InventoryPage` Page Object.
+2. Implement selector for product items.
+3. Verify that at least 6 products are displayed on the page.
 
 ## Acceptance Criteria
-
-> (See Standard DoD in AGENTS.md)
 
 - [ ] Page Object created for Inventory.
 - [ ] Test file verifies at least 6 products are displayed.
