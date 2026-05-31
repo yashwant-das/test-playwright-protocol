@@ -33,7 +33,19 @@ Everything else exists to support the protocol.
 The framework is built around a single workflow:
 
 ```text
-Select ↓ Understand ↓ Explore ↓ Plan ↓ Implement ↓ Verify ↓ Recover 
+Select
+  ↓
+Understand
+  ↓
+Explore
+  ↓
+Plan
+  ↓
+Implement
+  ↓
+Verify
+  ├─ PASS → DONE
+  └─ FAIL → BLOCKED → Recover → Verify
 ```
 
 This mirrors how experienced SDETs approach automation work.

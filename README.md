@@ -15,21 +15,18 @@ The framework enforces a single, disciplined workflow for all automation tasks:
 
 ```text
 Select
-    ↓
+  ↓
 Understand
-    ↓
+  ↓
 Explore
-    ↓
+  ↓
 Plan
-    ↓
+  ↓
 Implement
-    ↓
+  ↓
 Verify
-    ↓
-PASS → DONE
-FAIL → BLOCKED
-           ↓
-        Recover
+  ├─ PASS → DONE
+  └─ FAIL → BLOCKED → Recover → Verify
 ```
 
 ## Quick Start
