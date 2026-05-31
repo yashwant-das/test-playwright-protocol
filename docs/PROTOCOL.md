@@ -465,12 +465,6 @@ Show Board
 Show Blocked Tasks 
 ```
 
-Future enhancements:
-
-- Clipboard support
-- AI handoff prompt generation
-- Recovery prompt generation
-
 ---
 
 ## Commit Conventions
@@ -603,11 +597,29 @@ Code written without successful verification is not considered complete.
 
 ## Agent Completion Protocol
 
-AI assistants must use the following format when reporting task completion or blocks. This format is recognized by the protocol.
+The verification step is the final authority in SPP.
 
-### 1. Success Response
+AI assistants must not claim a task is complete unless verification has successfully passed.
 
-Use this format only when all verification gates pass:
+### 1. Ready for Verification
+
+Use this response when implementation is finished but verification has not yet been executed.
+
+```text
+Task <TASK_ID> Ready for Verification
+Summary:
+✅ Created <PageObject> with JSDoc
+✅ Created <TestFile> verifying <Requirement>
+✅ No raw locators used
+
+Next Step:
+Run:
+npm run task <TASK_ID>
+```
+
+### 2. Complete Response
+
+Use this response only when verification has successfully passed.
 
 ```text
 Task <TASK_ID> Complete ✓
@@ -618,13 +630,11 @@ Summary:
 ✅ lint passed
 ✅ tests passed
 All acceptance criteria met.
-
-👉 Next Step: Run `npm run task <TASK_ID>`
 ```
 
-### 2. Blocked Response
+### 3. Blocked Response
 
-Use this format when verification fails or the task cannot proceed:
+Use this response when implementation cannot proceed or verification fails.
 
 ```text
 Task <TASK_ID> Blocked
@@ -633,6 +643,10 @@ Summary:
 - <What failed or remains incomplete>
 - <Relevant command that failed>
 
-Required next step:
-Read `logs/last_run.log`, fix the issue, and retry `npm run task <TASK_ID>`.
+Recovery Required:
+1. Review logs/last_run.log
+2. Identify the root cause
+3. Apply the smallest possible fix
+4. Retry:
+npm run task <TASK_ID>
 ```
