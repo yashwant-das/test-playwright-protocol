@@ -390,13 +390,15 @@ Risk:
 
 ### Pre-Commit
 
+Fast, local validation to prevent common mistakes.
+
 Required:
 
-```bash
-npm run lint
-```
-
----
+- **lint-staged**: Runs project-specific linting on changed files.
+- **Selector Health Check**: Validates ARIA-first strategies in Page Objects.
+- **Focused Test Protection**: Blocks `test.only()` and `describe.only()`.
+- **Hard Wait Protection**: Blocks `page.waitForTimeout()`.
+- **Skipped Test Detection**: Warns on `test.skip()`.
 
 ### Verification Gates
 

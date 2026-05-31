@@ -29,6 +29,16 @@ This framework follows the **Smart Playwright Protocol (SPP) v2.0**:
 - **Specs** (`tests/`): Test scenarios and business assertions.
 - **ESLint** (`eslint.config.ts`): Enforces quality gates and JSDoc metadata.
 - **MCP server** (`mcp/server.ts`): Task lifecycle tools for AI-assisted IDEs.
+- **Git hooks** (`.husky/`): `pre-commit` blocks `.only` and `waitForTimeout`; `commit-msg` enforces Conventional Commit format.
+
+## Commit Conventions
+
+- **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `build`, `arch`, `heal`
+- **Examples**:
+  - `feat(cli): add task generator`
+  - `fix(tasks): handle blocked task parsing`
+  - `build(deps): upgrade playwright`
+  - `heal(selectors): repair checkout locator`
 
 ## Critical Coding Rules
 
