@@ -27,3 +27,9 @@ This document tracks planned architectural changes, toolchain upgrades, and fram
 **Status:** `PENDING`
 **Owner:** Framework
 **Why it matters:** Allow the `npm run task next` command to prioritize tasks based on explicit metadata.
+
+### 5. Upgrade ESLint Configuration
+
+**Status:** `PENDING`
+**Owner:** Framework
+**Why it matters:** The `tseslint.config()` method is deprecated. ESLint core now provides `defineConfig()`, which is the recommended approach for modern flat configurations.
