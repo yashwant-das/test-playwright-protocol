@@ -2,31 +2,30 @@
 
 SPP prioritizes simplicity, verification-first development, and practical automation workflows. Roadmap items should improve usability and operational maturity without increasing architectural complexity.
 
-## v2.1 — Operational Maturity
+## v2.1 — Operational Maturity (Completed)
 
 Purpose: Improve onboarding, adoption, and automation maturity without changing protocol architecture.
 
 ### GitHub Actions Verification Workflow
 
-- **Priority:** High
+- **Status:** COMPLETED
 - **Goal:** Provide a minimal GitHub Actions workflow that executes `npm install`, `npm run lint`, and `npm test` on pull requests and pushes.
-- **Notes:** Keep implementation lightweight and maintain SPP simplicity.
 
 ### Environment Configuration Support
 
-- **Priority:** High
+- **Status:** COMPLETED
 - **Goal:** Introduce environment-based configuration (e.g., `BASE_URL`).
 - **Deliverables:** `.env.example` and README guidance to improve adoption and onboarding.
 
 ### Node Runtime Declaration
 
-- **Priority:** Medium
+- **Status:** COMPLETED
 - **Goal:** Declare supported Node.js versions (e.g., `node >=18`).
 - **Purpose:** Reduce onboarding friction.
 
 ### Dependency Refresh
 
-- **Priority:** Medium
+- **Status:** COMPLETED
 - **Goal:** Review and upgrade Playwright, Clipboardy, and supporting tooling only when justified.
 - **Notes:** Avoid dependency churn and preserve framework stability.
 
