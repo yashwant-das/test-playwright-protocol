@@ -20,7 +20,8 @@ function isARIALocator(call: CallExpression): boolean {
         'getByLabel',
         'getByPlaceholder',
         'getByAltText',
-        'getByTitle'
+        'getByTitle',
+        'getByTestId'
     ];
     return validMethods.some(method => expr.includes(`.${method}`));
 }

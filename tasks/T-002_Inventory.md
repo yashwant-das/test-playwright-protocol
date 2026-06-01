@@ -1,7 +1,7 @@
 ---
 id: "T-002"
 title: "Verify Inventory Page"
-status: "BLOCKED"
+status: "DONE"
 dependsOn: ["T-001"]
 ---
 
@@ -28,5 +28,5 @@ Risk: Failure to display products prevents core e-commerce functionality.
 
 ## Acceptance Criteria
 
-- [ ] Page Object created for Inventory.
-- [ ] Test file verifies at least 6 products are displayed.
+- [x] Page Object created for Inventory.
+- [x] Test file verifies at least 6 products are displayed.

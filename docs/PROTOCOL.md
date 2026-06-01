@@ -135,13 +135,16 @@ A task is never considered complete without successful verification.
 
 #### 5. Browser Exploration Layer
 
-Playwright MCP is the **recommended** mechanism for browser exploration and selector validation. The protocol requires validation against reality, not a specific tool.
+Playwright MCP is the recommended mechanism for browser exploration and selector validation when selector discovery, UI investigation, or application exploration is required.
+The protocol requires validation against reality, not a specific tool.
 
 ---
 
 #### 6. Lifecycle Management Layer (Optional)
 
-The **SPP Lifecycle MCP** (located in `mcp/server.ts`) is an **optional and experimental** component. It provides tools for programmatic task activation and verification within AI-assisted IDEs. Most users will interact directly with task files and the CLI.
+The SPP Lifecycle MCP (located in mcp/server.ts) is optional and experimental.
+It provides programmatic task activation and verification for AI-enabled IDEs.
+Most users will interact directly with task files and the CLI.
 
 ---
 
@@ -280,9 +283,10 @@ IN_PROGRESS → BLOCKED
 When verification fails:
 
 1. Read logs.
-2. Diagnose root cause.
-3. Apply smallest possible fix.
-4. Re-run verification.
+2. Identify the root cause.
+3. Confirm the root cause using available evidence.
+4. Apply the smallest possible fix.
+5. Re-run verification.
 
 Repeat until verification succeeds.
 
@@ -597,9 +601,6 @@ The protocol favors simplicity over automation complexity.
 
 A task may move to DONE only when:
 
-- Understanding completed
-- Exploration completed
-- Implementation completed
 - Acceptance criteria satisfied
 - Lint passes
 - Tests pass
@@ -646,6 +647,8 @@ Summary:
 ✅ lint passed
 ✅ tests passed
 All acceptance criteria met.
+Recommended Next Step:
+Review the generated changes and commit if satisfied.
 ```
 
 ### 3. Blocked Response

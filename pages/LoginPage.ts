@@ -5,21 +5,21 @@ export class LoginPage extends BasePage {
     /**
      * @selector placeholder="Username"
      * @strategy getByPlaceholder
-     * @verified 2024-01-25
+     * @verified 2026-06-01
      */
     public readonly usernameInput: Locator;
 
     /**
      * @selector placeholder="Password"
      * @strategy getByPlaceholder
-     * @verified 2024-01-25
+     * @verified 2026-06-01
      */
     public readonly passwordInput: Locator;
 
     /**
      * @selector name="Login"
      * @strategy getByRole
-     * @verified 2024-01-25
+     * @verified 2026-06-01
      */
     public readonly loginButton: Locator;
 
