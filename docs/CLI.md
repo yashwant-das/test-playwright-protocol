@@ -142,10 +142,12 @@ Please register the following MCP servers in my IDE's MCP configuration file:
    "args": ["tsx", "<ABSOLUTE_PATH_TO_mcp/server.ts>"],
    "env": { "NODE_OPTIONS": "--disable-warning=DEP0205" }
 
-For Antigravity IDE, the config file is at `~/.gemini/antigravity-ide/mcp_config.json`.
-For Cursor, the config file is at `.cursor/mcp.json` in the project root.
-
-Read the existing config if it exists, or initialize a new one. Write the updated config and confirm once completed.
+Configuration file locations:
+- Antigravity IDE: `~/.gemini/config/mcp_config.json`
+- Gemini CLI: `~/.gemini/settings.json`
+- Cursor: `.cursor/mcp.json` in the project root
+- VS Code: `.vscode/mcp.json` in the workspace root
+Read the existing configuration if it exists; otherwise, initialize a new one. Add or update the MCP server entries without removing any existing servers, write the updated configuration, and confirm once completed.
 ```
 
 ### Manual Configuration
@@ -169,6 +171,7 @@ Add both servers to your IDE's MCP configuration file:
   }
 }
 ```
+
 
 Replace `/absolute/path/to/repo/` with the actual path to your cloned repository.
 
