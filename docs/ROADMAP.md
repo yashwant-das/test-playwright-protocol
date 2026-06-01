@@ -1,35 +1,57 @@
-# Roadmap & Improvements
+# Roadmap
 
-This document tracks planned architectural changes, toolchain upgrades, and framework improvements for the Smart Playwright Protocol (SPP).
+SPP prioritizes simplicity, verification-first development, and practical automation workflows. Roadmap items should improve usability and operational maturity without increasing architectural complexity.
 
-## ⏳ Backlog (Pending)
+## v2.1 — Operational Maturity
 
-### 1. Task Frontmatter Validation
+Purpose: Improve onboarding, adoption, and automation maturity without changing protocol architecture.
 
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** Prevent confusing task activation behavior due to invalid YAML or missing required fields.
+### GitHub Actions Verification Workflow
+- **Priority:** High
+- **Goal:** Provide a minimal GitHub Actions workflow that executes `npm install`, `npm run lint`, and `npm test` on pull requests and pushes.
+- **Notes:** Keep implementation lightweight and maintain SPP simplicity.
 
-### 2. CI Verification Workflow
+### Environment Configuration Support
+- **Priority:** High
+- **Goal:** Introduce environment-based configuration (e.g., `BASE_URL`).
+- **Deliverables:** `.env.example` and README guidance to improve adoption and onboarding.
 
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** Enforce quality gates in a remote pipeline before merging pull requests.
+### Node Runtime Declaration
+- **Priority:** Medium
+- **Goal:** Declare supported Node.js versions (e.g., `node >=18`).
+- **Purpose:** Reduce onboarding friction.
 
-### 3. Configurable Quality Gates
+### Dependency Refresh
+- **Priority:** Medium
+- **Goal:** Review and upgrade Playwright, Clipboardy, and supporting tooling only when justified.
+- **Notes:** Avoid dependency churn and preserve framework stability.
 
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** Allow users to promote warnings (like skipped tests) to errors based on project needs.
+## Backlog
 
-### 4. Priority-Aware Task Selection
+### Task Frontmatter Validation
+- **Priority:** Medium
+- **Goal:** Validate required task metadata before activation.
+- **Why it matters:** Prevent confusing task activation behavior due to invalid YAML or missing required fields.
 
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** Allow the `npm run task next` command to prioritize tasks based on explicit metadata.
+### Configurable Quality Gates
+- **Priority:** Low
+- **Goal:** Allow teams to enable or disable selected verification gates.
+- **Notes:** Maintain current defaults.
 
-### 5. Upgrade ESLint Configuration
+### Priority-Aware Task Selection
+- **Priority:** Low
+- **Goal:** Allow optional priority-based task ordering.
+- **Notes:** SPP should continue to prefer simple next-task execution by default.
 
-**Status:** `PENDING`
-**Owner:** Framework
-**Why it matters:** The `tseslint.config()` method is deprecated. ESLint core now provides `defineConfig()`, which is the recommended approach for modern flat configurations.
+## Non-Goals
+
+The following are intentionally outside the scope of SPP:
+
+- Multi-agent systems
+- Autonomous planning
+- Vector databases
+- Self-healing architectures
+- Distributed task orchestration
+- Database-backed task storage
+- Cloud task management
+- AI memory systems
