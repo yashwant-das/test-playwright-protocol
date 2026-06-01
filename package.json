@@ -8,7 +8,7 @@
   "scripts": {
     "test": "playwright test",
     "lint:code": "eslint 'pages/**/*.ts' 'tests/**/*.ts'",
-    "lint:md": "markdownlint '**/*.md' --ignore node_modules",
+    "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore playwright-report --ignore test-results",
     "lint": "npm run lint:code && npm run lint:md",
     "task": "ts-node scripts/task.ts",
     "mcp": "NODE_OPTIONS='--disable-warning=DEP0205' npx tsx mcp/server.ts",

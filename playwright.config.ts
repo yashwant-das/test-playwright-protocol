@@ -27,6 +27,7 @@ export default defineConfig({
   // Shared settings
   use: {
     baseURL: process.env.BASE_URL || 'https://www.saucedemo.com',
+    testIdAttribute: 'data-test',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
