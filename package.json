@@ -18,11 +18,11 @@
     "pages/**/*.ts": "tsx scripts/check-selectors.ts"
   },
   "devDependencies": {
-    "@clack/prompts": "^1.4.0",
+    "@clack/prompts": "^1.5.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@playwright/test": "^1.41.0",
+    "@playwright/test": "^1.60.0",
     "@types/clipboardy": "^1.1.0",
-    "@types/node": "^20.11.0",
+    "@types/node": "^20.19.41",
     "clipboardy": "^2.3.0",
     "dotenv": "^17.4.2",
     "eslint": "^9.39.4",
@@ -31,7 +31,7 @@
     "front-matter": "^4.0.2",
     "husky": "^9.0.0",
     "jiti": "^2.7.0",
-    "lint-staged": "^17.0.5",
+    "lint-staged": "^17.0.7",
     "markdownlint-cli": "^0.47.0",
     "picocolors": "^1.1.1",
     "ts-morph": "^28.0.0",
