@@ -13,7 +13,7 @@ test.describe('Login Page Navigation', () => {
 
         // 2. Meaningful assertions - verify page title and URL
         await expect(page).toHaveTitle(/Swag Labs/);
-        await expect(page).toHaveURL(baseURL + '/');
+        await expect(page).toHaveURL(`${baseURL}/`);
 
         // 3. Verify form elements are present and enabled
         await expect(loginPage.usernameInput).toBeVisible();
