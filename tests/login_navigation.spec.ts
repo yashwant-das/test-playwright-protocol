@@ -2,20 +2,18 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 
 test.describe('Login Page Navigation', () => {
-    const baseURL = 'https://www.saucedemo.com/';
-
-    test('should navigate to login page and verify elements', async ({ page }) => {
+    test('should navigate to login page and verify elements', async ({ page, baseURL }) => {
         const loginPage = new LoginPage(page);
 
         // Navigate to the login page
-        await loginPage.goto(baseURL);
+        await loginPage.goto('/');
 
         // 1. Verify page is loaded with all required elements
         await loginPage.isLoaded();
 
         // 2. Meaningful assertions - verify page title and URL
         await expect(page).toHaveTitle(/Swag Labs/);
-        await expect(page).toHaveURL(baseURL);
+        await expect(page).toHaveURL(baseURL + '/');
 
         // 3. Verify form elements are present and enabled
         await expect(loginPage.usernameInput).toBeVisible();
