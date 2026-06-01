@@ -54,3 +54,4 @@ lint_output.txt
 .Trashes
 ehthumbs.db
 Thumbs.db
+/.playwright-mcp
