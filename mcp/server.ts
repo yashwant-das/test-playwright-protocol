@@ -13,7 +13,7 @@ import { Task } from '../types/task';
 
 const server = new McpServer({
     name: 'smart-playwright-protocol',
-    version: '2.0.1',
+    version: '2.1.0',
 });
 
 const TASKS_DIR = path.resolve(__dirname, '../tasks');
@@ -213,12 +213,12 @@ function textResponse(text: string) {
 // ---------------------------------------------------------------------------
 
 /**
- * Tool to generate a new SPP v2.0.1 compliant task file in the tasks/ directory.
+ * Tool to generate a new SPP v2.1.0 compliant task file in the tasks/ directory.
  */
 server.registerTool(
     'create_task',
     {
-        description: 'Generate a new SPP v2.0.1 compliant task file in the tasks/ directory. This tool ensures consistent task structure and metadata.',
+        description: 'Generate a new SPP v2.1.0 compliant task file in the tasks/ directory. This tool ensures consistent task structure and metadata.',
         inputSchema: {
             taskId: z
                 .string()

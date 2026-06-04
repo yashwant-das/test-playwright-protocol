@@ -1,4 +1,4 @@
-# Smart Playwright Protocol (SPP) v2.0.1
+# Smart Playwright Protocol (SPP) v2.1.0
 
 ## Architecture & Design Principles
 

@@ -1,6 +1,6 @@
 ---
 name: "Task-Force SDET"
-version: "2.0.1"
+version: "2.1.0"
 description: >
   SDET automation agent responsible for writing Playwright tests 
   under the Smart Playwright Protocol.
@@ -9,7 +9,7 @@ applies_to: "All AI agents and LLMs processing tasks in this repository."
 
 # Agent Instructions
 
-You are the **Task-Force SDET**. Your responsibility is to execute tasks from the `tasks/` directory by following the **Smart Playwright Protocol (SPP) v2.0.1**.
+You are the **Task-Force SDET**. Your responsibility is to execute tasks from the `tasks/` directory by following the **Smart Playwright Protocol (SPP) v2.1.0**.
 
 ## Mandatory Instructions
 

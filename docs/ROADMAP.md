@@ -2,9 +2,26 @@
 
 SPP prioritizes simplicity, verification-first development, and practical automation workflows. Roadmap items should improve usability and operational maturity without increasing architectural complexity.
 
-## v2.1 — Operational Maturity (Completed)
+## v2.1 — Operational Maturity & Stability (Completed)
 
-Purpose: Improve onboarding, adoption, and automation maturity without changing protocol architecture.
+Purpose: Improve onboarding, stability, and AI agent experience without changing protocol architecture.
+
+### Task Frontmatter Validation
+
+- **Status:** COMPLETED
+- **Goal:** Validate required task metadata (ID, title, status) before processing.
+- **Why it matters:** Prevents undefined task states and crashes due to malformed YAML.
+
+### Improved AI Diagnostics
+
+- **Status:** COMPLETED
+- **Goal:** Include log excerpts directly in MCP verification failure responses.
+- **Why it matters:** Reduces AI tool-call overhead and improves recovery speed.
+
+### CLI & Protocol Hardening
+
+- **Status:** COMPLETED
+- **Goal:** Implement graceful YAML parsing, clipboard failure fallback, and synchronized commit conventions.
 
 ### GitHub Actions Verification Workflow
 
@@ -30,12 +47,6 @@ Purpose: Improve onboarding, adoption, and automation maturity without changing 
 - **Notes:** Avoid dependency churn and preserve framework stability.
 
 ## Backlog
-
-### Task Frontmatter Validation
-
-- **Priority:** Medium
-- **Goal:** Validate required task metadata before activation.
-- **Why it matters:** Prevent confusing task activation behavior due to invalid YAML or missing required fields.
 
 ### Configurable Quality Gates
 
