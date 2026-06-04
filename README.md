@@ -1,13 +1,13 @@
 # Smart Playwright Protocol (SPP)
 
-[![SPP](https://img.shields.io/badge/-SPP_v2.0-%232EAD33?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol)
-[![Release](https://img.shields.io/badge/-Release_v2.0.0-%23007ACC?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol/releases/tag/v2.0.0)
+[![SPP](https://img.shields.io/badge/-SPP_v2.0.1-%232EAD33?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol)
+[![Release](https://img.shields.io/badge/-Release_v2.0.1-%23007ACC?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol/releases/tag/v2.0.1)
 [![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev)
 [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org)
 [![NodeJS](https://img.shields.io/badge/node.js-6DA55F.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 
-## Smart Playwright Protocol (SPP) v2.0
+## Smart Playwright Protocol (SPP) v2.0.1
 
 AI-assisted Playwright automation using a structured, protocol-driven workflow. This framework keeps human-AI collaboration explicit, reviewable, and repeatable.
 
@@ -99,3 +99,4 @@ npm run task T-001
 | [docs/CLI.md](docs/CLI.md) | **Command reference**: tools, menu, board, and troubleshooting. |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Future enhancements and planned improvements. |
 | [AGENTS.md](AGENTS.md) | Lightweight instructions for AI assistants. |
+|
