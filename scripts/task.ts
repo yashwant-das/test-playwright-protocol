@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import fm from 'front-matter';
-import { intro, outro, select, log, spinner as clackSpinner, note, group, text, cancel, isCancel } from '@clack/prompts';
+import { intro, outro, select, log, spinner as clackSpinner, note, group, text, isCancel } from '@clack/prompts';
 import { Task } from '../types/task';
 import { exec } from 'child_process';
 import pc from 'picocolors';
@@ -23,6 +23,9 @@ const theme = {
     noteWarning: (text: string) => pc.red(pc.bold(text)),
 };
 
+/**
+ * Handles the cancellation of the CLI process.
+ */
 function handleCancel() {
     outro('Cancelled.');
     process.exit(0);
@@ -33,10 +36,19 @@ const LOG_DIR = path.join(process.cwd(), 'logs');
 if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR);
 const LOG_FILE = path.join(LOG_DIR, 'last_run.log');
 
+/**
+ * Appends a message to the framework's last_run.log file.
+ * @param msg The message to log to the file.
+ */
 function mkLog(msg: string) {
     fs.appendFileSync(LOG_FILE, msg + '\n');
 }
 
+/**
+ * Executes a shell command and captures its output to the log file.
+ * @param command The shell command to execute.
+ * @returns A promise that resolves when the command completes.
+ */
 async function runCmd(command: string): Promise<void> {
     mkLog(`\n> ${command}\n`);
     return new Promise((resolve, reject) => {
@@ -52,6 +64,10 @@ async function runCmd(command: string): Promise<void> {
     });
 }
 
+/**
+ * Reads all task files from the tasks/ directory and parses their front-matter.
+ * @returns An array of parsed Task objects with associated file information.
+ */
 function getAllTasks(): (Task & { file: string, content: string })[] {
     const files = fs.readdirSync(TASKS_DIR).filter(f => f.endsWith('.md') && f !== 'template.md');
     const tasks: (Task & { file: string, content: string })[] = [];
@@ -66,9 +82,9 @@ function getAllTasks(): (Task & { file: string, content: string })[] {
                 file: f,
                 content
             });
-        } catch (err: any) {
-            console.error(pc.red(`\n[Error] Failed to parse front-matter in ${pc.bold(f)}:`));
-            console.error(pc.red(err.message || err));
+        } catch (err: unknown) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            console.error(pc.red(`\n[Error] Failed to parse front-matter in ${pc.bold(f)}: ${errorMsg}`));
             console.error(pc.yellow(`Please check that the YAML syntax is correct in tasks/${f}.\n`));
             process.exit(1);
         }
@@ -76,6 +92,14 @@ function getAllTasks(): (Task & { file: string, content: string })[] {
     return tasks;
 }
 
+/**
+ * Determines the next eligible task based on SPP priority.
+ * 1. IN_PROGRESS tasks (Resume)
+ * 2. BLOCKED tasks (Retry)
+ * 3. TODO tasks (Start, checking dependencies)
+ * @param tasks The list of all tasks.
+ * @returns The next Task to process, or null if none are eligible.
+ */
 function getNextTask(tasks: (Task & { file: string, content: string })[]) {
     const inProgress = tasks.find(t => t.status === 'IN_PROGRESS');
     if (inProgress) return inProgress;
@@ -90,6 +114,12 @@ function getNextTask(tasks: (Task & { file: string, content: string })[]) {
       .at(0) ?? null;
 }
 
+/**
+ * Updates the status field in a task file's front-matter.
+ * @param filePath Path to the task markdown file.
+ * @param fullContent The current raw content of the file.
+ * @param newStatus The new status to set.
+ */
 function updateTaskStatus(filePath: string, fullContent: string, newStatus: string) {
     let newContent = fullContent.replace(/status: ["']?.*["']?/, `status: "${newStatus}"`);
     if (newStatus === 'DONE') {
@@ -98,15 +128,24 @@ function updateTaskStatus(filePath: string, fullContent: string, newStatus: stri
     fs.writeFileSync(filePath, newContent);
 }
 
+/**
+ * Attempts to copy text to the system clipboard.
+ * @param text The text to copy.
+ * @returns True if successful, false otherwise.
+ */
 function copyToClipboard(text: string) {
     try {
         clipboard.writeSync(text);
         return true;
-    } catch (err) {
+    } catch {
         return false;
     }
 }
 
+/**
+ * Orchestrates the processing of a task through its lifecycle (Activation, Verification, Recovery).
+ * @param task The task object to process.
+ */
 async function processTask(task: Task & { file: string, content: string }) {
     const filePath = path.join(TASKS_DIR, task.file);
     const actualTaskId = task.id;
@@ -160,7 +199,8 @@ async function processTask(task: Task & { file: string, content: string }) {
             updateTaskStatus(filePath, task.content, 'DONE');
             log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to pick up the next task.`);
         }
-        else if (task.status === 'DONE') {
+        else {
+            // Task status is DONE
             log.step(`Status: ${theme.status('DONE')}. Re-running verification.`);
             
             fs.writeFileSync(LOG_FILE, `--- Verification Run Started for ${actualTaskId} ---\n`);
@@ -178,7 +218,7 @@ async function processTask(task: Task & { file: string, content: string }) {
             await runCmd(cmd);
             s.stop(theme.success('Verification passed. Task remains DONE.'));
         }
-    } catch (e) {
+    } catch {
         if (s) {
             s.stop(theme.error('Command failed.'));
         }
@@ -196,6 +236,9 @@ async function processTask(task: Task & { file: string, content: string }) {
     }
 }
 
+/**
+ * Interactive wizard to create a new task markdown file with standardized structure and metadata.
+ */
 async function createTask() {
     const task = await group(
         {
@@ -285,9 +328,27 @@ ${acList}
 
     fs.writeFileSync(filePath, content);
     log.success(`Created task: ${theme.taskId(task.id)} ${pc.dim(filename)}`);
-    log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to activate this task.`);
+
+    const allTasks = getAllTasks();
+    const next = getNextTask(allTasks);
+
+    if (next?.id === task.id) {
+        log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to activate ${theme.taskId(task.id)}.`);
+    } else if (next?.status === 'IN_PROGRESS') {
+        log.info(`${pc.blue('Next:')} An active task already exists (${theme.taskId(next.id)}).`);
+        log.info(`      Run ${pc.bold('npm run task next')} to continue protocol execution.`);
+    } else if (next?.status === 'BLOCKED') {
+        log.info(`${pc.blue('Next:')} A BLOCKED task currently exists (${theme.taskId(next.id)}).`);
+        log.info(`      Run ${pc.bold('npm run task next')} to continue protocol execution.`);
+    } else {
+        log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to continue protocol execution.`);
+    }
 }
 
+/**
+ * Displays a summary of the task board, including status counts and active/recent tasks.
+ * @param tasks The list of tasks to display.
+ */
 function showTaskBoard(tasks: (Task & { file: string, content: string })[]) {
     const summary = {
         TODO: tasks.filter(t => t.status === 'TODO').length,
@@ -311,6 +372,10 @@ function showTaskBoard(tasks: (Task & { file: string, content: string })[]) {
     });
 }
 
+/**
+ * Displays a list of blocked tasks and their failure reasons.
+ * @param tasks The list of tasks to filter for blocked status.
+ */
 function showBlockedTasks(tasks: (Task & { file: string, content: string })[]) {
     const blocked = tasks.filter(t => t.status === 'BLOCKED');
     if (blocked.length === 0) log.success('No blocked tasks.');
@@ -324,8 +389,11 @@ function showBlockedTasks(tasks: (Task & { file: string, content: string })[]) {
     }
 }
 
+/**
+ * CLI Entry point. Parses arguments and launches the appropriate workflow or interactive menu.
+ */
 async function main() {
-    let argTask = process.argv[2];
+    const argTask = process.argv[2];
     const tasks = getAllTasks();
 
     if (argTask) {

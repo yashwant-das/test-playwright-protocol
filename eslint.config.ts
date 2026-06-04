@@ -2,19 +2,35 @@ import tseslint from 'typescript-eslint';
 import playwright from 'eslint-plugin-playwright';
 import jsdoc from 'eslint-plugin-jsdoc';
 
-export default tseslint.config(
-  tseslint.configs.strictTypeChecked,
+export default [
+  ...tseslint.configs.strictTypeChecked,
   {
     plugins: {
       jsdoc
     },
     rules: {
-      'jsdoc/require-jsdoc': ['error', { require: { FunctionDeclaration: true, MethodDefinition: true }, contexts: ['PropertyDefinition'] }],
       'jsdoc/check-tag-names': ['error', { definedTags: ['selector', 'strategy', 'verified', 'reason'] }],
       // Ignore unused vars when starting with underscore
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }]
     },
+  },
+  {
+    // Mandatory JSDoc for Core Framework and CLI
+    files: ['scripts/**/*.ts', 'mcp/**/*.ts', 'mcp/server.ts'],
+    plugins: { jsdoc },
+    rules: {
+      'jsdoc/require-jsdoc': ['error', { 
+        require: { 
+          FunctionDeclaration: true, 
+          MethodDefinition: true 
+        },
+        contexts: ['ExportDefaultDeclaration', 'ExportNamedDeclaration'] 
+      }],
+      'jsdoc/require-description': 'error',
+      'jsdoc/require-param-description': 'error',
+      'jsdoc/require-returns-description': 'error',
+    }
   },
   {
     ...playwright.configs['flat/recommended'],
@@ -33,4 +49,4 @@ export default tseslint.config(
       parserOptions: { project: true }
     }
   }
-);
+];
