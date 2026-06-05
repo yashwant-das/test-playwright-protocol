@@ -18,7 +18,7 @@ The website exists to lower the barrier to entry for new users without fragmenti
 
 - **Astro**: A modern static site generator that ships zero JavaScript by default, ensuring fast load times.
 - **Starlight**: Astro's official documentation theme. It provides a robust sidebar, MDX support, and search capabilities out of the box.
-- **astro-mermaid**: A client-side integration that renders Mermaid diagrams (used heavily in our architecture and protocol overviews) natively in Starlight without requiring build-time SVG compilation.
+- **@pasqal-io/starlight-client-mermaid**: A Starlight-native plugin that renders Mermaid diagrams (used heavily in our architecture and protocol overviews) on the client side without interfering with Astro's MDX parser.
 - **Pagefind**: A static search engine integrated into Starlight that provides full-text search capabilities without needing a backend server.
 - **GitHub Pages**: The hosting platform. The site is deployed statically via GitHub Actions.
 
@@ -65,11 +65,12 @@ The `sync-docs.mjs` script acts as a bridge, reading the root files, transformin
 ### Transformation Pipeline
 When `npm run sync` is executed, the following happens to each mapped document:
 
-1. **Header De-duplication**: Removes the top-level `# H1` tag (Starlight automatically generates the title from frontmatter).
-2. **Link Rewriting**: Scans for GitHub-style relative links (e.g., `[CLI](docs/CLI.md)`) and rewrites them to absolute web slugs (e.g., `[CLI](/test-playwright-protocol/reference/cli/)`).
-3. **Alert Conversion**: Employs a state-machine parser to convert GitHub-flavored blockquote alerts (`> [!TIP]`, `> [!WARNING]`) into Starlight's native Markdown Directives (`:::tip`, `:::danger`). It handles multi-line alerts and all five GitHub alert types.
-4. **Badge Stripping**: Removes raw Markdown image badges (like CI status or NPM versions) that clutter technical reference pages.
-5. **Frontmatter Injection**: Prepends the required YAML frontmatter (`title`, `description`) so Starlight can index the page for navigation and search.
+1. **Frontmatter Stripping**: Removes any existing YAML frontmatter block from the source file to prevent conflicts.
+2. **Header De-duplication**: Removes the top-level `# H1` tag (Starlight automatically generates the title from frontmatter).
+3. **Link Rewriting**: Scans for GitHub-style relative links (e.g., `[CLI](docs/CLI.md)`) and rewrites them to absolute web slugs (e.g., `[CLI](/test-playwright-protocol/reference/cli/)`).
+4. **Alert Conversion**: Employs a state-machine parser to convert GitHub-flavored blockquote alerts (`> [!TIP]`, `> [!WARNING]`) into Starlight's native Markdown Directives (`:::tip`, `:::danger`). It handles multi-line alerts and all five GitHub alert types.
+5. **Badge Stripping**: Removes raw Markdown image badges (like CI status or NPM versions) that clutter technical reference pages.
+6. **Frontmatter Injection**: Prepends the required YAML frontmatter (`title`, `description`) so Starlight can index the page for navigation and search.
 
 ### Lifecycle Integration
 The script is hooked into the NPM lifecycle in `package.json`:
@@ -84,7 +85,7 @@ This guarantees that the web view is always perfectly synchronized with the repo
 
 - **Why Two Layers?** Early iterations of the site simply rendered the repository files. While technically accurate, it provided a poor onboarding experience. By separating custom MDX pages (Layer 1) from synced Markdown (Layer 2), we achieve high human readability without sacrificing technical authority.
 - **Why `.mdx` for Onboarding?** MDX allows the injection of rich interactive components (like Starlight's `<Steps>` or `<CardGrid>`) directly into Markdown, which is crucial for modern onboarding guides.
-- **Why NOT `remark-mermaidjs`?** Older Astro setups use remark plugins to render Mermaid to SVGs at build time. This requires Playwright to run during the build step, which slows down CI/CD pipelines. `astro-mermaid` offloads rendering to the client, keeping the build pipeline fast and lean.
+- **Why NOT `remark-mermaidjs` or `astro-mermaid`?** Older Astro setups use remark plugins to render Mermaid to SVGs at build time. This requires Playwright to run during the build step, which slows down CI/CD pipelines. We initially tried `astro-mermaid`, but it interfered with the core MDX compiler. We settled on `@pasqal-io/starlight-client-mermaid` because it is a native Starlight plugin that keeps builds fast and preserves MDX functionality.
 
 ---
 

@@ -36,12 +36,13 @@ The core of the site's sustainability. It automatically pulls `PROTOCOL.md`, `CL
 
 ### 2. Intelligent Content Transformations
 The sync engine doesn't just copy files; it upgrades them for the web:
+- **Frontmatter Stripping**: Automatically detects and removes existing YAML frontmatter from root files (like `AGENTS.md`) before injecting Starlight-specific metadata.
 - **Link Rewriting**: Translates local GitHub paths (`docs/PROTOCOL.md`) to Starlight web slugs (`/test-playwright-protocol/reference/protocol/`).
 - **State-Machine Alert Parsing**: Converts all variations of GitHub alerts (`> [!TIP]`, `> [!WARNING]`, including multi-line content) into Starlight's Markdown Directives (`:::tip`, `:::danger`).
 - **Badge Stripping**: Automatically removes raw Markdown badges from the synced reference docs to keep the UI clean.
 
 ### 3. Client-Side Mermaid Rendering
-Integrated `astro-mermaid` to parse and render ````mermaid` blocks directly in the browser. This avoided the build-time complexity and CI/CD performance hit associated with older Playwright-based SVG renderers.
+Integrated `@pasqal-io/starlight-client-mermaid` to parse and render ````mermaid` blocks directly in the browser. This plugin integrates natively with Starlight without breaking MDX component rendering, avoiding the build-time complexity of older SVGs.
 
 ### 4. Custom Styling & Typography
 Implemented `website/src/styles/custom.css` to override default Starlight styles. The site uses an "Ocean Blue" accent palette, improved line heights (1.8), and specific styling for workflow cards.
@@ -56,7 +57,7 @@ Transitioned onboarding pages (Home, Quick Start, Why SPP, Examples, Architectur
 ### What is working well
 - **The Two-Layer Split**: Creating a hard boundary between hand-authored MDX onboarding pages and auto-synced Markdown reference pages is highly effective. It prevents marketing fluff from bleeding into technical specs.
 - **The Sync Script**: Running the sync process as a `prebuild` step (via NPM scripts) rather than a separate CI action ensures that local development exactly matches production.
-- **astro-mermaid**: Offloading diagram rendering to the client has kept the build times incredibly fast (< 3 seconds).
+- **@pasqal-io/starlight-client-mermaid**: Offloading diagram rendering to the client via this Starlight-native plugin has kept build times incredibly fast while preserving MDX parsing capabilities.
 
 ### What should remain unchanged
 - **The Source of Truth**: `PROTOCOL.md` and `CLI.md` at the root of the repository MUST remain the only places technical rules are defined. The website must never become an alternative source of truth.
