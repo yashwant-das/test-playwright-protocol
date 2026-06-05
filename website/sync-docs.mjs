@@ -61,6 +61,37 @@ function rewriteLinks(content) {
     .replace(/\[([^\]]+)\]\(README\.md\)/g, '[$1](/test-playwright-protocol/quick-start/)');
 }
 
+function transformAlerts(content) {
+  const lines = content.split('\n');
+  const result = [];
+  let inAlert = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const alertMatch = line.match(/^> \[!(TIP|NOTE|IMPORTANT|WARNING|CAUTION)\]/);
+
+    if (alertMatch) {
+      const type = alertMatch[1].toLowerCase() === 'caution' ? 'danger' : alertMatch[1].toLowerCase();
+      result.push(`:::${type}`);
+      inAlert = true;
+    } else if (inAlert && line.startsWith('> ')) {
+      result.push(line.replace(/^> /, ''));
+    } else if (inAlert && line.trim() === '>') {
+      result.push('');
+    } else {
+      if (inAlert) {
+        result.push(':::');
+        inAlert = false;
+      }
+      result.push(line);
+    }
+  }
+  
+  if (inAlert) result.push(':::');
+  
+  return result.join('\n');
+}
+
 function sync() {
   console.log('🔄 Syncing documentation from root...');
   
@@ -81,12 +112,8 @@ function sync() {
     // Rewrite links
     content = rewriteLinks(content);
     
-    // Add tip alert for CLI.md relative paths
-    if (source.includes('CLI.md')) {
-      content = content.replace(/> \[!TIP\]/, ':::tip');
-      content = content.replace(/> After activating/, 'After activating');
-      content = content.replace(/:::tip\n:::tip/, ':::tip');
-    }
+    // Transform Alerts
+    content = transformAlerts(content);
 
     const frontmatter = [
       '---',

@@ -6,8 +6,9 @@ description: Command reference for the Smart Playwright Protocol CLI.
 
 `scripts/task.ts` is the local CLI that moves Markdown task files through the framework lifecycle. Use this document when you need exact command behavior, board usage, and configuration.
 
-> [!NOTE]
-> For first-time setup and onboarding, start with [README.md](../README.md). For the architectural source of truth (workflow, states, rules), see [PROTOCOL.md](/test-playwright-protocol/protocol/).
+:::note
+For first-time setup and onboarding, start with [README.md](../README.md). For the architectural source of truth (workflow, states, rules), see [PROTOCOL.md](/test-playwright-protocol/protocol/).
+:::
 
 ## Commands
 
@@ -65,6 +66,7 @@ Generated when verification fails and the task moves to `BLOCKED`. Points the ag
 
 :::tip
 After activating a task or seeing a failure, simply switch to your AI assistant's chat and paste (Ctrl+V/Cmd+V) to provide all necessary context.
+:::
 
 ## Task Board & Status
 

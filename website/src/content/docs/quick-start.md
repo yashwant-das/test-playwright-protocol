@@ -12,8 +12,9 @@ description: Get started with Smart Playwright Protocol in under 5 minutes.
 
 AI-assisted Playwright automation using a structured, protocol-driven workflow. SPP keeps human-AI collaboration explicit, reviewable, and repeatable through file-backed tasks and automated quality gates.
 
-> [!IMPORTANT]
-> **New to SPP?** Visit our [Documentation Site](https://yashwant-das.github.io/test-playwright-protocol/) for the best onboarding experience.
+:::important
+**New to SPP?** Visit our [Documentation Site](https://yashwant-das.github.io/test-playwright-protocol/) for the best onboarding experience.
+:::
 
 ## Quick Start (30 Seconds)
 
