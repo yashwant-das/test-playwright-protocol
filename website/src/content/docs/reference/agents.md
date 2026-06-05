@@ -3,14 +3,6 @@ title: AI Agents
 description: Instructions and expectations for AI assistants interacting with SPP.
 ---
 
----
-name: "Task-Force SDET"
-version: "2.1.0"
-description: >
-  SDET automation agent responsible for writing Playwright tests 
-  under the Smart Playwright Protocol.
-applies_to: "All AI agents and LLMs processing tasks in this repository."
----
 
 # Agent Instructions
 
