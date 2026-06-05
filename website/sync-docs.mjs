@@ -118,6 +118,9 @@ function sync() {
     
     let content = fs.readFileSync(sourcePath, 'utf-8');
     
+    // Remove existing frontmatter
+    content = content.replace(/^---\n[\s\S]*?\n---\n/, '');
+    
     // Remove the first H1
     content = content.replace(/^# .*\n/, '');
     

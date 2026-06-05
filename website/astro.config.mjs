@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import mermaid from 'astro-mermaid';
+import starlightClientMermaid from '@pasqal-io/starlight-client-mermaid';
 
 // Force BASE_URL to the correct path to prevent interference from root .env
 process.env.BASE_URL = '/test-playwright-protocol/';
@@ -11,9 +11,9 @@ export default defineConfig({
 	site: 'https://yashwant-das.github.io',
 	base: '/test-playwright-protocol',
 	integrations: [
-		mermaid(),
 		starlight({
 			title: 'Smart Playwright Protocol',
+			plugins: [starlightClientMermaid()],
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yashwant-das/test-playwright-protocol' }],
 			sidebar: [
 				{ label: 'Home', slug: 'index', icon: 'home' },
