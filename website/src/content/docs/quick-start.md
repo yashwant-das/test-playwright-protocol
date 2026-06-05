@@ -4,11 +4,6 @@ description: Get started with Smart Playwright Protocol in under 5 minutes.
 ---
 
 
-[![Documentation](https://img.shields.io/badge/Documentation-GitHub_Pages-blue?style=for-the-badge)](https://yashwant-das.github.io/test-playwright-protocol/)
-[![SPP](https://img.shields.io/badge/-SPP_v2.1.0-%232EAD33?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol)
-[![Release](https://img.shields.io/badge/-Release_v2.1.0-%23007ACC?style=for-the-badge)](https://github.com/yashwant-das/test-playwright-protocol/releases/tag/v2.1.0)
-[![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev)
-[![NodeJS](https://img.shields.io/badge/node.js-6DA55F.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 
 AI-assisted Playwright automation using a structured, protocol-driven workflow. SPP keeps human-AI collaboration explicit, reviewable, and repeatable through file-backed tasks and automated quality gates.
 
@@ -18,12 +13,17 @@ AI-assisted Playwright automation using a structured, protocol-driven workflow. 
 
 ## Quick Start (30 Seconds)
 
+import { Steps } from '@astrojs/starlight/components';
+
+<Steps>
+
 1. **Install:** `npm install && npx playwright install`
 2. **Setup:** `cp .env.example .env`
 3. **Task:** `npm run task create` (Create a new task)
 4. **Work:** `npm run task next` (Activate task & copy AI prompt)
 5. **Verify:** `npm run task T-001` (Run automated quality gate)
 
+</Steps>
 ## Why SPP?
 
 SPP replaces "hope-driven" AI automation with a disciplined lifecycle:

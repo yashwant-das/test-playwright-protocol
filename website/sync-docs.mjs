@@ -45,10 +45,6 @@ const DOCS_MAPPING = [
 ];
 
 function rewriteLinks(content) {
-  // Rewrite internal .md links to Starlight slugs
-  // e.g., [Protocol](docs/PROTOCOL.md) -> [Protocol](/test-playwright-protocol/protocol/)
-  // e.g., [CLI](CLI.md) -> [CLI](/test-playwright-protocol/cli/)
-  
   return content
     .replace(/\[([^\]]+)\]\(docs\/PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/protocol/)')
     .replace(/\[([^\]]+)\]\(PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/protocol/)')
@@ -92,8 +88,57 @@ function transformAlerts(content) {
   return result.join('\n');
 }
 
+function beautifyContent(content, source) {
+  // 1. Remove GitHub badges (they look bad in docs)
+  content = content.replace(/\[!\[.*\]\(.*\)\]\(.*\)\n/g, '');
+  
+  // 2. Remove redundant "New to SPP?" alert from README (it points back to itself)
+  if (source.includes('README.md')) {
+    content = content.replace(/> \[!IMPORTANT\]\n> \*\*New to SPP\?\*\*.*/g, '');
+  }
+
+  // 3. Convert numbered lists to Starlight <Steps> for Quick Start
+  if (source.includes('README.md')) {
+    const lines = content.split('\n');
+    let inSteps = false;
+    const beautified = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('## Quick Start')) {
+        beautified.push(line);
+        beautified.push('\nimport { Steps } from \'@astrojs/starlight/components\';\n');
+        beautified.push('<Steps>');
+        inSteps = true;
+        continue;
+      }
+      
+      if (inSteps && /^\d+\./.test(line.trim())) {
+        beautified.push(line);
+      } else if (inSteps && line.trim() === '') {
+        beautified.push(line);
+      } else if (inSteps) {
+        beautified.push('</Steps>');
+        beautified.push(line);
+        inSteps = false;
+      } else {
+        beautified.push(line);
+      }
+    }
+    if (inSteps) beautified.push('</Steps>');
+    content = beautified.join('\n');
+  }
+
+  // 4. Wrap the workflow diagram in a card if it's text-based
+  content = content.replace(/```text\nSelect\n(  ↓\n.*)+\n```/g, (match) => {
+    return `:::note[Workflow Lifecycle]\n${match}\n:::`;
+  });
+
+  return content;
+}
+
 function sync() {
-  console.log('🔄 Syncing documentation from root...');
+  console.log('🔄 Syncing and Beautifying documentation...');
   
   for (const { source, target, metadata } of DOCS_MAPPING) {
     const sourcePath = path.resolve(source);
@@ -106,14 +151,13 @@ function sync() {
     
     let content = fs.readFileSync(sourcePath, 'utf-8');
     
-    // Remove the first H1 if it's the same as the title (Starlight adds its own)
+    // Remove the first H1
     content = content.replace(/^# .*\n/, '');
     
-    // Rewrite links
+    // Core transformations
     content = rewriteLinks(content);
-    
-    // Transform Alerts
     content = transformAlerts(content);
+    content = beautifyContent(content, source);
 
     const frontmatter = [
       '---',
@@ -125,7 +169,7 @@ function sync() {
     ].join('\n');
     
     fs.writeFileSync(targetPath, frontmatter + content);
-    console.log(`✅ Synced ${source} -> ${target}`);
+    console.log(`✅ Synced & Polished ${source} -> ${target}`);
   }
 }
 

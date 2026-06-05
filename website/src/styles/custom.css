@@ -1,0 +1,25 @@
+:root {
+  --sl-color-accent-low: #1d2b3a;
+  --sl-color-accent: #3498db;
+  --sl-color-accent-high: #5dade2;
+}
+
+/* Improve typography and spacing */
+.sl-markdown-content h1, .sl-markdown-content h2, .sl-markdown-content h3 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.sl-markdown-content p {
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+/* Custom card styling for the workflow */
+.workflow-card {
+  border-left: 4px solid var(--sl-color-accent);
+  padding: 1rem;
+  background: var(--sl-color-gray-6);
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+}
