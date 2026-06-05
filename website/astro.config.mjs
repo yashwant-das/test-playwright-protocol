@@ -16,25 +16,18 @@ export default defineConfig({
 			title: 'Smart Playwright Protocol',
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/yashwant-das/test-playwright-protocol' }],
 			sidebar: [
+				{ label: 'Home', slug: 'index', icon: 'home' },
+				{ label: 'Quick Start', slug: 'quick-start', icon: 'rocket' },
+				{ label: 'Why SPP?', slug: 'why-spp', icon: 'information' },
+				{ label: 'Examples', slug: 'examples', icon: 'list-format' },
+				{ label: 'Architecture Overview', slug: 'architecture', icon: 'puzzle' },
 				{
-					label: 'Introduction',
+					label: 'Reference Documentation',
 					items: [
-						{ label: 'Home', slug: 'index', icon: 'home' },
-						{ label: 'Quick Start', slug: 'quick-start', icon: 'rocket' },
-					],
-				},
-				{
-					label: 'Core Protocol',
-					items: [
-						{ label: 'Protocol', slug: 'protocol', icon: 'open-book' },
-						{ label: 'AI Agents', slug: 'agents', icon: 'laptop' },
-					],
-				},
-				{
-					label: 'Reference',
-					items: [
-						{ label: 'CLI', slug: 'cli', icon: 'terminal' },
-						{ label: 'Roadmap', slug: 'roadmap', icon: 'list-format' },
+						{ label: 'Protocol', slug: 'reference/protocol', icon: 'setting' },
+						{ label: 'CLI', slug: 'reference/cli', icon: 'terminal' },
+						{ label: 'Roadmap', slug: 'reference/roadmap', icon: 'list-format' },
+						{ label: 'AI Agents', slug: 'reference/agents', icon: 'laptop' },
 					],
 				},
 			],

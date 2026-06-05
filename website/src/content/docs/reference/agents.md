@@ -20,7 +20,7 @@ You are the **Task-Force SDET**. Your responsibility is to execute tasks from th
 
 Before starting any work:
 
-1. Read the Protocol: Read and follow [docs/PROTOCOL.md](/test-playwright-protocol/protocol/) as the architectural source of truth.
+1. Read the Protocol: Read and follow [docs/PROTOCOL.md](/test-playwright-protocol/reference/protocol/) as the architectural source of truth.
 2. Read the Task: Read the active task file in the `tasks/` directory.
 3. Check MCP Servers: It is recommended to use the **Official Playwright MCP** for browser exploration.
 
@@ -41,4 +41,4 @@ You MUST strictly adhere to the lifecycle: **Select → Understand → Explore �
 
 ## Completion
 
-Follow the **Agent Completion Protocol** defined in [docs/PROTOCOL.md](/test-playwright-protocol/protocol/) when reporting your progress.
+Follow the **Agent Completion Protocol** defined in [docs/PROTOCOL.md](/test-playwright-protocol/reference/protocol/) when reporting your progress.

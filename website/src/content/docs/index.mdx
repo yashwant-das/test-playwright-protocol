@@ -16,21 +16,17 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## The Problem
+## What is SPP?
 
-Most AI-assisted automation follows a "Hope-Driven" workflow:
+Smart Playwright Protocol (SPP) is a lightweight, file-backed workflow designed to make AI-assisted automation predictable, reviewable, and verifiable. It shifts the AI's role from "coding by hope" to "implementing by protocol."
 
-**Generic AI Workflow**
-Prompt → Code → **Hope**
+## Why SPP exists?
 
-**SPP Workflow**
-Task → Protocol → Verification → **Done**
+Most AI coding tools follow a fragile "Prompt → Code → Hope" pattern. SPP introduces a disciplined lifecycle that ensures every change is verified against business requirements and repository standards before it's considered complete.
 
-SPP replaces hope with a structured, file-backed protocol that ensures every change is verified against business requirements before it's considered complete.
+## How it works?
 
-## The Protocol
-
-SPP uses a disciplined lifecycle to ensure quality and repeatability.
+SPP uses Markdown **Task Files** as the source of truth. A local CLI moves these tasks through a structured lifecycle, generating precise handoff prompts for AI assistants and automated quality gates for verification.
 
 ```mermaid
 graph TD
@@ -44,8 +40,6 @@ graph TD
     BLOCKED --> Recover
     Recover --> Verify
 ```
-
-## Core Principles
 
 <CardGrid stagger>
 	<Card title="Verification First" icon="approve-check">
@@ -64,3 +58,15 @@ graph TD
 		No complex databases or multi-agent systems. Just files, a CLI, and Playwright.
 	</Card>
 </CardGrid>
+
+## Who is it for?
+
+- **SDETs** looking to leverage AI without sacrificing quality.
+- **QA Teams** transitioning to automated testing with AI assistance.
+- **Developers** who want a structured way to build robust Playwright suites.
+
+## How do I get started?
+
+The best way to experience SPP is to run your first task. It takes less than 5 minutes to set up.
+
+[Get Started with the Quick Start Guide](/test-playwright-protocol/quick-start/)

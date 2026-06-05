@@ -4,7 +4,7 @@ import path from 'path';
 const DOCS_MAPPING = [
   {
     source: '../docs/PROTOCOL.md',
-    target: 'src/content/docs/protocol.md',
+    target: 'src/content/docs/reference/protocol.md',
     metadata: {
       title: 'Protocol',
       description: 'The architectural source of truth for the Smart Playwright Protocol.',
@@ -12,7 +12,7 @@ const DOCS_MAPPING = [
   },
   {
     source: '../docs/CLI.md',
-    target: 'src/content/docs/cli.md',
+    target: 'src/content/docs/reference/cli.md',
     metadata: {
       title: 'CLI',
       description: 'Command reference for the Smart Playwright Protocol CLI.',
@@ -20,7 +20,7 @@ const DOCS_MAPPING = [
   },
   {
     source: '../docs/ROADMAP.md',
-    target: 'src/content/docs/roadmap.md',
+    target: 'src/content/docs/reference/roadmap.md',
     metadata: {
       title: 'Roadmap',
       description: 'Future enhancements and planned improvements for SPP.',
@@ -28,32 +28,25 @@ const DOCS_MAPPING = [
   },
   {
     source: '../AGENTS.md',
-    target: 'src/content/docs/agents.md',
+    target: 'src/content/docs/reference/agents.md',
     metadata: {
       title: 'AI Agents',
       description: 'Instructions and expectations for AI assistants interacting with SPP.',
-    }
-  },
-  {
-    source: '../README.md',
-    target: 'src/content/docs/quick-start.md',
-    metadata: {
-      title: 'Quick Start',
-      description: 'Get started with Smart Playwright Protocol in under 5 minutes.',
     }
   }
 ];
 
 function rewriteLinks(content) {
+  // Rewrite internal .md links to Starlight slugs under reference/
   return content
-    .replace(/\[([^\]]+)\]\(docs\/PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/protocol/)')
-    .replace(/\[([^\]]+)\]\(PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/protocol/)')
-    .replace(/\[([^\]]+)\]\(docs\/CLI\.md\)/g, '[$1](/test-playwright-protocol/cli/)')
-    .replace(/\[([^\]]+)\]\(CLI\.md\)/g, '[$1](/test-playwright-protocol/cli/)')
-    .replace(/\[([^\]]+)\]\(docs\/ROADMAP\.md\)/g, '[$1](/test-playwright-protocol/roadmap/)')
-    .replace(/\[([^\]]+)\]\(ROADMAP\.md\)/g, '[$1](/test-playwright-protocol/roadmap/)')
-    .replace(/\[([^\]]+)\]\(AGENTS\.md\)/g, '[$1](/test-playwright-protocol/agents/)')
-    .replace(/\[([^\]]+)\]\(\.\.\/AGENTS\.md\)/g, '[$1](/test-playwright-protocol/agents/)')
+    .replace(/\[([^\]]+)\]\(docs\/PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/reference/protocol/)')
+    .replace(/\[([^\]]+)\]\(PROTOCOL\.md\)/g, '[$1](/test-playwright-protocol/reference/protocol/)')
+    .replace(/\[([^\]]+)\]\(docs\/CLI\.md\)/g, '[$1](/test-playwright-protocol/reference/cli/)')
+    .replace(/\[([^\]]+)\]\(CLI\.md\)/g, '[$1](/test-playwright-protocol/reference/cli/)')
+    .replace(/\[([^\]]+)\]\(docs\/ROADMAP\.md\)/g, '[$1](/test-playwright-protocol/reference/roadmap/)')
+    .replace(/\[([^\]]+)\]\(ROADMAP\.md\)/g, '[$1](/test-playwright-protocol/reference/roadmap/)')
+    .replace(/\[([^\]]+)\]\(AGENTS\.md\)/g, '[$1](/test-playwright-protocol/reference/agents/)')
+    .replace(/\[([^\]]+)\]\(\.\.\/AGENTS\.md\)/g, '[$1](/test-playwright-protocol/reference/agents/)')
     .replace(/\[([^\]]+)\]\(README\.md\)/g, '[$1](/test-playwright-protocol/quick-start/)');
 }
 
@@ -89,47 +82,15 @@ function transformAlerts(content) {
 }
 
 function beautifyContent(content, source) {
-  // 1. Remove GitHub badges (they look bad in docs)
+  // 1. Remove GitHub badges
   content = content.replace(/\[!\[.*\]\(.*\)\]\(.*\)\n/g, '');
   
-  // 2. Remove redundant "New to SPP?" alert from README (it points back to itself)
+  // 2. Remove redundant "New to SPP?" alert from README
   if (source.includes('README.md')) {
     content = content.replace(/> \[!IMPORTANT\]\n> \*\*New to SPP\?\*\*.*/g, '');
   }
 
-  // 3. Convert numbered lists to Starlight <Steps> for Quick Start
-  if (source.includes('README.md')) {
-    const lines = content.split('\n');
-    let inSteps = false;
-    const beautified = [];
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.includes('## Quick Start')) {
-        beautified.push(line);
-        beautified.push('\nimport { Steps } from \'@astrojs/starlight/components\';\n');
-        beautified.push('<Steps>');
-        inSteps = true;
-        continue;
-      }
-      
-      if (inSteps && /^\d+\./.test(line.trim())) {
-        beautified.push(line);
-      } else if (inSteps && line.trim() === '') {
-        beautified.push(line);
-      } else if (inSteps) {
-        beautified.push('</Steps>');
-        beautified.push(line);
-        inSteps = false;
-      } else {
-        beautified.push(line);
-      }
-    }
-    if (inSteps) beautified.push('</Steps>');
-    content = beautified.join('\n');
-  }
-
-  // 4. Wrap the workflow diagram in a card if it's text-based
+  // 3. Wrap the workflow diagram in a card if it's text-based
   content = content.replace(/```text\nSelect\n(  ↓\n.*)+\n```/g, (match) => {
     return `:::note[Workflow Lifecycle]\n${match}\n:::`;
   });
@@ -138,11 +99,17 @@ function beautifyContent(content, source) {
 }
 
 function sync() {
-  console.log('🔄 Syncing and Beautifying documentation...');
+  console.log('🔄 Syncing and Beautifying reference documentation...');
   
   for (const { source, target, metadata } of DOCS_MAPPING) {
     const sourcePath = path.resolve(source);
     const targetPath = path.resolve(target);
+    
+    // Ensure target directory exists
+    const targetDir = path.dirname(targetPath);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
     
     if (!fs.existsSync(sourcePath)) {
       console.warn(`⚠️ Source file not found: ${source}`);
