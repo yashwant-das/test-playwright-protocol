@@ -59,18 +59,18 @@ Below is expanded context for the highest-priority items to assist in implementi
 
 ### 1. Stale Task References
 
-- **Affected Tasks:** [T-004](./tasks/T-004_Logout.md), [T-005](./tasks/T-005_Footer.md), [T-006](./tasks/T-006_Sorting.md), [T-007](./tasks/T-007_checkout-step1.md), [T-008](./tasks/T-008_checkout-final.md), [T-009](./tasks/T-009_login-error.md)
+- **Affected Tasks:** [T-004](../tasks/T-004_Logout.md), [T-005](../tasks/T-005_Footer.md), [T-006](../tasks/T-006_Sorting.md), [T-007](../tasks/T-007_checkout-step1.md), [T-008](../tasks/T-008_checkout-final.md), [T-009](../tasks/T-009_login-error.md)
 - **The Problem:** 6 out of 10 tasks point to `PageObject` or `TestFile` paths that do not exist in the repository (`pages/Components/Sidebar.ts`, `tests/logout.spec.ts`, etc.). Because T-004 and T-010 are technically marked `BLOCKED`, this artificially inflates the blocked queue with dead-weight tasks.
 - **Action:** Verify what was intended for these 6 tasks. Either implement the missing `.ts` files, mark them as completed if they were implemented elsewhere, or remove/resolve stale task entries to clear the board.
 
 ### 2. CI Flake Risk
 
-- **The Problem:** The [GitHub Actions verify workflow](./.github/workflows/verify.yml) runs `npm test` against an external endpoint (Sauce Demo). If Sauce Demo's network dips or its HTML layout shifts unexpectedly, tests fail with no automated retry logic built into the local Playwright config for retries.
+- **The Problem:** The [GitHub Actions verify workflow](../.github/workflows/verify.yml) runs `npm test` against an external endpoint (Sauce Demo). If Sauce Demo's network dips or its HTML layout shifts unexpectedly, tests fail with no automated retry logic built into the local Playwright config for retries.
 - **Action:** While `retries: 2` is set in `playwright.config.ts` for CI, ensure it applies globally across all workers. Add a note in documentation about anticipated Sauce Demo flakiness and consider adding mock fallbacks or network isolation if testing against the public site becomes unmanageable.
 
 ### 6. Short Test Timeout
 
-- **The Problem:** `timeout: 30 * 1000` (30 seconds) in [playwright.config.ts](./playwright.config.ts) may be tight when Sauce Demo suffers high latency. Combined with parallelized workers, this can cause premature timeouts under poor network conditions.
+- **The Problem:** `timeout: 30 * 1000` (30 seconds) in [playwright.config.ts](../playwright.config.ts) may be tight when Sauce Demo suffers high latency. Combined with parallelized workers, this can cause premature timeouts under poor network conditions.
 - **Action:** Increase the default timeout to `45000ms` or make it configurable via an environment variable (e.g., `process.env.PLAYWRIGHT_TIMEOUT`).
 
 ### 8. Selector Analysis Blindspot
