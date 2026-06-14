@@ -10,6 +10,9 @@ npx tsx scripts/check-selectors.ts
 
 # 3. Quality Gates for Playwright tests
 STAGED_SPECS=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.spec\.ts$" || true)
+if [ -z "$STAGED_SPECS" ]; then
+  STAGED_SPECS=$(git diff HEAD --name-only --diff-filter=ACM | grep -E "\.spec\.ts$" || true)
+fi
 
 if [ -n "$STAGED_SPECS" ]; then
   # Check for focused tests
@@ -41,6 +44,9 @@ fi
 
 # 4. Check for hard waits in all staged TS files
 STAGED_TS=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.ts$" || true)
+if [ -z "$STAGED_TS" ]; then
+  STAGED_TS=$(git diff HEAD --name-only --diff-filter=ACM | grep -E "\.ts$" || true)
+fi
 if [ -n "$STAGED_TS" ]; then
   if echo "$STAGED_TS" | xargs grep -nE "page\.waitForTimeout" > .hard_waits 2>&1; then
     echo ""

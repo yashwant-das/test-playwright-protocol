@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "playwright test",
-    "lint:code": "eslint 'pages/**/*.ts' 'tests/**/*.ts'",
+    "lint:code": "eslint 'pages/**/*.ts' 'tests/**/*.ts' 'scripts/**/*.ts' 'mcp/**/*.ts'",
     "lint:md": "markdownlint '**/*.md' --ignore node_modules --ignore playwright-report --ignore test-results",
     "lint": "npm run lint:code && npm run lint:md",
     "task": "ts-node scripts/task.ts",
@@ -15,7 +15,13 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "pages/**/*.ts": "tsx scripts/check-selectors.ts"
+    "pages/**/*.ts": [
+      "tsx scripts/check-selectors.ts",
+      "eslint"
+    ],
+    "tests/**/*.ts": "eslint",
+    "scripts/**/*.ts": "eslint",
+    "mcp/**/*.ts": "eslint"
   },
   "devDependencies": {
     "@clack/prompts": "^1.5.0",

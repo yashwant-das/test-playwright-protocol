@@ -5,16 +5,20 @@ import path from 'path';
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+if (!process.env.BASE_URL) {
+  console.warn('\x1b[33m%s\x1b[0m', 'Warning: BASE_URL is not set. Falling back to default Sauce Demo URL.');
+}
+
 export default defineConfig({
   testDir: './tests',
 
   // Maximum time one test can run
-  timeout: 30 * 1000,
+  timeout: process.env.PLAYWRIGHT_TIMEOUT ? parseInt(process.env.PLAYWRIGHT_TIMEOUT) : 45 * 1000,
 
   // Test execution settings
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1, // Note: Tests hit live Sauce Demo, which can be flaky
   workers: process.env.CI ? 1 : undefined,
 
   // Reporter configuration

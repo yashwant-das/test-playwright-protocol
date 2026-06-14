@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import fm from 'front-matter';
-import { intro, outro, select, log, spinner as clackSpinner, note, group, text, isCancel } from '@clack/prompts';
+import { intro, outro, select, log, spinner as clackSpinner, note, group, text, isCancel, confirm } from '@clack/prompts';
 import { Task } from '../types/task';
 import { exec } from 'child_process';
 import pc from 'picocolors';
@@ -69,7 +69,7 @@ async function runCmd(command: string): Promise<void> {
  * @returns An array of parsed Task objects with associated file information.
  */
 function getAllTasks(): (Task & { file: string, content: string })[] {
-    const files = fs.readdirSync(TASKS_DIR).filter(f => f.endsWith('.md') && f !== 'template.md');
+    const files = fs.readdirSync(TASKS_DIR).filter(f => f.endsWith('.md') && f !== 'template.md').sort();
     const tasks: (Task & { file: string, content: string })[] = [];
     for (const f of files) {
         const filePath = path.join(TASKS_DIR, f);
@@ -201,13 +201,27 @@ async function processTask(task: Task & { file: string, content: string }) {
             await runCmd(`npm test ${testFile}`);
             s.stop(theme.success('Test passed'));
 
-            log.success(theme.success('Verification passed. Marking task DONE.'));
+            log.success(theme.success('Verification passed.'));
             note(
                 `✓ lint passed\n✓ tests passed\n✓ no focused tests\n✓ no hard waits detected`,
                 theme.noteTitle('Verification Summary')
             );
-            updateTaskStatus(filePath, task.content, 'DONE');
-            log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to pick up the next task.`);
+            
+            const markDone = await confirm({
+                message: 'Verification passed. Mark task as DONE?',
+                initialValue: true
+            });
+            
+            if (isCancel(markDone)) {
+                handleCancel();
+            }
+            
+            if (markDone) {
+                updateTaskStatus(filePath, task.content, 'DONE');
+                log.info(`${pc.blue('Next:')} Run ${pc.bold('npm run task next')} to pick up the next task.`);
+            } else {
+                log.info(`Task remains ${theme.status(task.status)}.`);
+            }
         }
         else {
             // Task status is DONE
@@ -416,6 +430,9 @@ async function main() {
                 log.info('No eligible tasks found. Resolve blocked work or add a TODO task.');
                 process.exit(0);
             }
+            if (next.status === 'IN_PROGRESS') {
+                log.info("No new TODO tasks available (or current is unfinished). Re-running verification on currently active task.");
+            }
             await processTask(next);
             process.exit(0);
         } else if (argTask === 'status') {
@@ -433,6 +450,7 @@ async function main() {
                 log.error(`Task ${argTask} not found.`);
                 process.exit(1);
             }
+
             const done = new Set(tasks.filter(t => t.status === 'DONE').map(t => t.id));
             const unmetDeps = (target.dependsOn ?? []).filter(dep => !done.has(dep));
             if (unmetDeps.length > 0) {
@@ -442,6 +460,28 @@ async function main() {
                     theme.noteWarning('Unmet Dependencies')
                 );
                 process.exit(1);
+            }
+
+            // Protocol Check: Prevent forcing a new TODO if there is already an active task
+            if (target.status === 'TODO') {
+                const inProgressTask = tasks.find(t => t.status === 'IN_PROGRESS');
+                if (inProgressTask) {
+                    log.error(`Protocol Violation: Task ${inProgressTask.id} is currently IN_PROGRESS.`);
+                    const shouldPark = await confirm({
+                        message: `Do you want to park it (revert to TODO) and start ${target.id} instead?`,
+                        initialValue: false
+                    });
+
+                    if (isCancel(shouldPark) || !shouldPark) {
+                        log.error(`Cannot start a new TODO task while ${inProgressTask.id} is IN_PROGRESS.`);
+                        process.exit(1);
+                    }
+
+                    // Park the current task
+                    const inProgressPath = path.join(process.cwd(), 'tasks', inProgressTask.file);
+                    updateTaskStatus(inProgressPath, inProgressTask.content, 'TODO');
+                    log.step(`Parked ${inProgressTask.id} back to TODO.`);
+                }
             }
             await processTask(target);
             process.exit(0);
@@ -471,6 +511,9 @@ async function main() {
         if (!next) {
             log.info('No eligible tasks found. Resolve blocked work or add a TODO task.');
         } else {
+            if (next.status === 'IN_PROGRESS') {
+                log.info("No new TODO tasks available (or current is unfinished). Re-running verification on currently active task.");
+            }
             await processTask(next);
         }
     } else if (command === 'verify') {

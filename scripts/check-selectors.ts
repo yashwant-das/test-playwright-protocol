@@ -13,8 +13,15 @@ const warnings: string[] = [];
  * @returns True if the call is a locator call.
  */
 function isLocatorCall(call: CallExpression): boolean {
-    const expr = call.getExpression().getText();
-    return expr.includes('.locator') || expr.includes('.getBy');
+    const expr = call.getExpression();
+    if (expr.getKind() === SyntaxKind.PropertyAccessExpression) {
+        const propAccess = expr.asKind(SyntaxKind.PropertyAccessExpression);
+        if (propAccess) {
+            const name = propAccess.getName();
+            return name === 'locator' || name.startsWith('getBy');
+        }
+    }
+    return false;
 }
 
 /**
@@ -23,17 +30,24 @@ function isLocatorCall(call: CallExpression): boolean {
  * @returns True if the locator is an ARIA-based selector.
  */
 function isARIALocator(call: CallExpression): boolean {
-    const expr = call.getExpression().getText();
-    const validMethods = [
-        'getByRole',
-        'getByText',
-        'getByLabel',
-        'getByPlaceholder',
-        'getByAltText',
-        'getByTitle',
-        'getByTestId'
-    ];
-    return validMethods.some(method => expr.includes(`.${method}`));
+    const expr = call.getExpression();
+    if (expr.getKind() === SyntaxKind.PropertyAccessExpression) {
+        const propAccess = expr.asKind(SyntaxKind.PropertyAccessExpression);
+        if (propAccess) {
+            const name = propAccess.getName();
+            const validMethods = [
+            'getByRole',
+            'getByText',
+            'getByLabel',
+            'getByPlaceholder',
+            'getByAltText',
+            'getByTitle',
+            'getByTestId'
+        ];
+        return validMethods.includes(name);
+        }
+    }
+    return false;
 }
 
 /**

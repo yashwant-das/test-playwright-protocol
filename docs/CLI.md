@@ -88,6 +88,10 @@ npm run task T-011
 
 This runs `npm run lint` and `npm test <declared-test-file>`.
 
+### Protocol Enforcement
+
+If you attempt to activate a new `TODO` task while another task is currently `IN_PROGRESS`, the CLI will detect a protocol violation. To prioritize developer experience while maintaining the SPP "one-task-at-a-time" rule, the CLI will interactively ask if you want to **park** the current active task (safely reverting it to `TODO`) before promoting your new urgent task.
+
 ### Logs
 
 The runner writes command output to:
