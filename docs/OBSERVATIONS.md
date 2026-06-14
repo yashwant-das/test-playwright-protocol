@@ -1,6 +1,6 @@
 # Project Observations & Issues Tracker
 
-**Project:** Smart Playwright Protocol (SPP) v2.1.0
+**Project:** Smart Playwright Protocol (SPP) v2.1.1
 **Date Created:** 2026-06-05
 
 ## Legend / Status Definitions
