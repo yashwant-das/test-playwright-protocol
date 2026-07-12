@@ -1,7 +1,7 @@
 ---
 id: "T-004"
 title: "Verify Logout Flow"
-status: "BLOCKED"
+status: "DONE"
 dependsOn: ["T-001"]
 ---
 
@@ -28,5 +28,5 @@ Risk: Broken logout keeps sessions active indefinitely.
 
 ## Acceptance Criteria
 
-- [ ] Sidebar component created.
-- [ ] Logout test passed.
+- [x] Sidebar component created.
+- [x] Logout test passed.
